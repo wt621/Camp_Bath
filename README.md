@@ -312,3 +312,6 @@ Google Maps APIを使った地図表示
 例えば、最近注目されているReactやNextについて。
 Reactについては**本リリース後に組み込む方向で検討**するのが良いかと考えています。
 その後、React単体のキャッチアップを行い、アプリに組み込む技術的な検証をした上で、組み込むかどうかを判断する形が理想かもしれません。
+
+### 11.画面遷移図:Figma URL
+https://www.figma.com/design/f7OCdKH04zqB0MwR4Uo9Go/%E7%94%BB%E9%9D%A2%E9%81%B7%E7%A7%BB%E5%9B%B3?node-id=0-1&t=Ie1Yn5DEOELcAqHA-1
