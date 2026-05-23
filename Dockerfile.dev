@@ -1,0 +1,20 @@
+FROM ruby:3.1.4
+
+ENV LANG C.UTF-8
+ENV TZ Asia/Tokyo
+ENV RAILS_ENV=development
+
+RUN apt-get update -qq && apt-get install -y \
+    ca-certificates curl gnupg vim nano git sqlite3 \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY Gemfile Gemfile.lock ./
+RUN gem install bundler && bundle install
+
+COPY . .
+
+CMD ["bin/rails", "server", "-b", "0.0.0.0"]
+
+
