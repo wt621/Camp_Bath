@@ -277,7 +277,7 @@ DEPENDENCIES
   bootsnap
   brakeman
   debug
-  error_highlight (>= 0.4.0)
+  error_highlight (= 0.7.0)
   importmap-rails
   jbuilder
   puma (>= 5.0)
@@ -291,4 +291,4 @@ DEPENDENCIES
   web-console
 
 BUNDLED WITH
-   2.4.13
+   2.6.9
