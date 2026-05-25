@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-
   root "maps#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
@@ -12,5 +11,5 @@ Rails.application.routes.draw do
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
   # Defines the root path route ("/")
-   #root "posts#index"
+  # root "posts#index"
 end
