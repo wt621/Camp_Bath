@@ -52,3 +52,5 @@ group :development do
 
   # Highlight the fine-grained location where an error occurred [https://github.com/ruby/error_highlight]
 end
+
+gem "devise", "~> 5.0"
