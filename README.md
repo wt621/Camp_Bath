@@ -208,7 +208,7 @@ Google Mapsだとキャンプ場から温泉施設へと検索のし直しや予
 温泉検索：Google Places API（Nearby Search）
 温泉情報表示：Google Maps JavaScript API（InfoWindow機能）＋ Google Places API
 ログイン機能：Ruby on Rails + Devise
-メモ機能：Ruby on Rails（ActiveRecord）＋ SQLite
+メモ機能：Ruby on Rails（ActiveRecord）＋ PostgreSQL
 
 ### 本リリースで作る機能
 お気に入り機能
@@ -265,7 +265,7 @@ Google Mapsだとキャンプ場から温泉施設へと検索のし直しや予
 ### 10-1. 使用予定の技術
 
 - フレームワーク：HTML + CSS + JavaScript、Ruby on Rails
-- DB：SQLite
+- DB：PostgreSQL
 - デプロイ先：Render
 - 使用予定ライブラリ：Google Maps JavaScript API、Google Places API
 
@@ -281,8 +281,8 @@ Google Mapsだとキャンプ場から温泉施設へと検索のし直しや予
 ・Ruby on Rails
 ログイン・メモなど「データ保存」に必要
 
-・SQLite
-環境構築がファイル1つで可能
+・PostgreSQL
+本番環境 (Render)でPostgreSQLが使用されるため開発環境も統一することで、環境差異によるバグを予防する
 
 ・Render（静的サイト）
 GitHubと連携し自動デプロイが可能なため設定が簡単
