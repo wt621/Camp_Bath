@@ -18,6 +18,13 @@
   </head>
 
   <body>
+    <header>
+      <% if user_signed_in? %>
+        <%= button_to "ログアウト", destroy_user_session_path, method: :delete %>
+      <% else %>
+        <%= link_to "ログイン", new_user_session_path %>
+      <% end %>
+    </header>
+
     <%= yield %>
-  </body>
-</html>
+</body>
