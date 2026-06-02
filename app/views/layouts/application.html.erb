@@ -19,12 +19,13 @@
 
   <body>
     <header>
-      <% if user_signed_in? %>
-        <%= button_to "ログアウト", destroy_user_session_path, method: :delete %>
-      <% else %>
-        <%= link_to "ログイン", new_user_session_path %>
+      <% unless current_page?(root_path) %>
+        <% if user_signed_in? %>
+          <%= button_to "ログアウト", destroy_user_session_path, method: :delete %>
+        <% else %>
+          <%= link_to "ログイン", new_user_session_path %>
+        <% end %>
       <% end %>
     </header>
-
     <%= yield %>
 </body>
