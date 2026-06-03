@@ -1,0 +1,14 @@
+ja:
+  devise:
+    sessions:
+      new:
+        sign_in: ログイン
+        submit: ログイン
+    registrations:
+      new:
+        sign_up: アカウント登録
+        submit: アカウント登録
+    passwords:
+      new:
+        forgot_your_password: パスワードを忘れましたか？
+        submit: パスワードリセット手順を送信
