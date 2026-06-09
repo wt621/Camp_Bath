@@ -102,6 +102,10 @@ GEM
     devise-i18n (1.16.0)
       devise (>= 5.0.0)
       rails-i18n
+    dotenv (3.2.0)
+    dotenv-rails (3.2.0)
+      dotenv (= 3.2.0)
+      railties (>= 6.1)
     drb (2.2.3)
     erb (4.0.4.1)
       cgi (>= 0.3.3)
@@ -297,6 +301,7 @@ DEPENDENCIES
   debug
   devise (~> 5.0)
   devise-i18n
+  dotenv-rails
   importmap-rails
   jbuilder
   pg
