@@ -1,3 +1,5 @@
-<h1>Camp-Bath 検索ページ</h1>
+<% content_for :head do %>
+  <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&v=weekly" defer></script>
+<% end %>
 
-<p>ここに地図が表示されます</p>
+<div id="map"></div>
