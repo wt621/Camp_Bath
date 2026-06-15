@@ -10,9 +10,17 @@ function initMap() {
   const mapElement = document.getElementById("map");
 
   if (mapElement && typeof google !== "undefined" && google.maps) {
-    new google.maps.Map(mapElement, {
+    const map = new google.maps.Map(mapElement, {
       zoom: 8,
       center: center
+    });
+
+    campsites.forEach((campsite) => {
+      new google.maps.Marker({
+        position: { lat: campsite.lat, lng: campsite.lng },
+        map: map,
+        title: campsite.name
+      });
     });
   } else {
     console.error("map element not found or Google Maps API not loaded");
