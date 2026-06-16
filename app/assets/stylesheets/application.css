@@ -14,7 +14,20 @@
  *= require_self
  */
  
+.search-container {
+  display: flex;
+  justify-content: space-between;
+  height: calc(100vh - 120px);
+}
+
+#campsite-panel {
+  width: 40%;
+  padding: 20px;
+  border-right: 1px solid #ccc;
+  overflow-y: auto;
+}
+
 #map {
-  height: 600px;
-  width: 100%;
+  width: 60%;
+  height: 100%;
 }

@@ -2,4 +2,11 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&v=weekly" defer></script>
 <% end %>
 
-<div id="map"></div>
+<div class="search-container">
+  <div id="campsite-panel">
+    <h2>キャンプ場情報</h2>
+    <p>キャンプ場を選択してください</p>
+  </div>
+
+  <div id="map"></div>
+</div>
