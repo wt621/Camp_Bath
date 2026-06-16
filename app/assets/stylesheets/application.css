@@ -25,6 +25,7 @@
   padding: 20px;
   border-right: 1px solid #ccc;
   overflow-y: auto;
+  background-color: #f0efef;
 }
 
 #map {
