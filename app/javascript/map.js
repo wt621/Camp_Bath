@@ -1,7 +1,6 @@
 import { campsites } from './campsites.js';
 
 function initMap() {
-
   const center = {
     lat: 35.681236,
     lng: 139.767125
@@ -15,11 +14,33 @@ function initMap() {
       center: center
     });
 
+    const panel = document.getElementById("campsite-panel");
+
     campsites.forEach((campsite) => {
-      new google.maps.Marker({
+      const marker = new google.maps.Marker({
         position: { lat: campsite.lat, lng: campsite.lng },
         map: map,
         title: campsite.name
+      });
+
+      marker.addListener("click", () => {
+        panel.innerHTML = `
+          <h2>キャンプ場情報</h2>
+          <h3>${campsite.name}</h3>
+    
+          <p><strong>住所</strong></p>
+          <p>${campsite.address}</p>
+    
+          <p><strong>営業時間</strong></p>
+          <p>${campsite.businessHours || '情報なし'}</p>
+      
+          <p><strong>公式サイト</strong></p>
+          <p>
+            ${campsite.url 
+              ? `<a href="${campsite.url}" target="_blank" rel="noopener noreferrer">公式サイトを見る</a>` 
+              : '公式サイト情報なし'}
+          </p>
+        `;
       });
     });
   } else {
