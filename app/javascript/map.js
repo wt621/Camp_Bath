@@ -14,6 +14,9 @@ function initMap() {
       center: center
     });
 
+    const service = new google.maps.places.PlacesService(map);
+    console.log(service);
+    
     const panel = document.getElementById("campsite-panel");
 
     campsites.forEach((campsite) => {
