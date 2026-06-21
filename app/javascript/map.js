@@ -44,6 +44,20 @@ function initMap() {
               : '公式サイト情報なし'}
           </p>
         `;
+        service.nearbySearch(
+          {
+            location: {
+              lat: campsite.lat,
+              lng: campsite.lng
+            },
+            radius: 15000,
+            keyword: "温泉"
+          },
+          (results, status) => {
+            console.log(results);
+            console.log(status);
+          }
+        );
       });
     });
   } else {
