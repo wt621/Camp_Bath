@@ -39,14 +39,23 @@ function initMap() {
           (results, status) => {
             console.log(status);
 
+            const sortedResults = results.sort((a, b) => {
+              return b.rating - a.rating;
+            });
+            const topThreeOnsens = sortedResults.slice(0, 3);
+
             let onsenListHtml = `
               <h3>周辺温泉</h3>
               <ul>
             `;
 
-            results.forEach((onsen) => {
+            topThreeOnsens.forEach((onsen) => {
               onsenListHtml += `
-                <li>${onsen.name}</li>
+                <li>
+                  <button data-place-id="${onsen.place_id}">
+                    ${onsen.name}
+                  </button>
+                </li>
               `;
             });
 
