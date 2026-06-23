@@ -39,13 +39,31 @@ function initMap() {
           (results, status) => {
             console.log(status);
 
-            const sortedResults = results.sort((a, b) => {
-              return b.rating - a.rating;
-            });
-            const topThreeOnsens = sortedResults.slice(0, 3);
+            const campsiteLocation = new google.maps.LatLng(campsite.lat, campsite.lng);
+            const resultsWithDistance = results.map(onsen => {
+            
+            const onsenLocation = new google.maps.LatLng(
+              onsen.geometry.location.lat(),
+              onsen.geometry.location.lng()
+            );
+
+            const distance = google.maps.geometry.spherical.computeDistanceBetween(
+              campsiteLocation,
+              onsenLocation
+            );
+
+            onsen.distance = distance;
+            return onsen;
+          });
+
+          const sortedResults = resultsWithDistance.sort((a, b) => {
+            return a.distance - b.distance;
+          });
+
+          const topThreeOnsens = sortedResults.slice(0, 3);
 
             let onsenListHtml = `
-              <h3>周辺温泉</h3>
+              <h3>周辺15km圏内の温泉</h3>
               <ul>
             `;
 
