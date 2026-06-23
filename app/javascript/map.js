@@ -27,23 +27,6 @@ function initMap() {
       });
 
       marker.addListener("click", () => {
-        panel.innerHTML = `
-          <h2>キャンプ場情報</h2>
-          <h3>${campsite.name}</h3>
-    
-          <p><strong>住所</strong></p>
-          <p>${campsite.address}</p>
-    
-          <p><strong>営業時間</strong></p>
-          <p>${campsite.businessHours || '情報なし'}</p>
-      
-          <p><strong>公式サイト</strong></p>
-          <p>
-            ${campsite.url 
-              ? `<a href="${campsite.url}" target="_blank" rel="noopener noreferrer">公式サイトを見る</a>` 
-              : '公式サイト情報なし'}
-          </p>
-        `;
         service.nearbySearch(
           {
             location: {
@@ -55,14 +38,41 @@ function initMap() {
           },
           (results, status) => {
             console.log(status);
+
+            let onsenListHtml = `
+              <h3>周辺温泉</h3>
+              <ul>
+            `;
+
             results.forEach((onsen) => {
-              console.log({
-                name: onsen.name,
-                vicinity: onsen.vicinity,
-                rating: onsen.rating,
-                place_id: onsen.place_id
-              });
+              onsenListHtml += `
+                <li>${onsen.name}</li>
+              `;
             });
+
+            onsenListHtml += `
+              </ul>
+            `;
+
+            panel.innerHTML = `
+              <h2>キャンプ場情報</h2>
+              <h3>${campsite.name}</h3>
+
+              <p><strong>住所</strong></p>
+              <p>${campsite.address}</p>
+
+              <p><strong>営業時間</strong></p>
+              <p>${campsite.businessHours || '情報なし'}</p>
+
+              <p><strong>サイトURL</strong></p>
+              <p>
+                ${campsite.url
+                  ? `<a href="${campsite.url}" target="_blank" rel="noopener noreferrer">公式サイトを見る</a>`
+                  : '公式サイト情報なし'}
+              </p>
+
+              ${onsenListHtml}
+            `;
           }
         );
       });
