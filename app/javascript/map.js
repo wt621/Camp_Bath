@@ -54,8 +54,15 @@ function initMap() {
             keyword: "温泉"
           },
           (results, status) => {
-            console.log(results);
             console.log(status);
+            results.forEach((onsen) => {
+              console.log({
+                name: onsen.name,
+                vicinity: onsen.vicinity,
+                rating: onsen.rating,
+                place_id: onsen.place_id
+              });
+            });
           }
         );
       });
