@@ -18,7 +18,8 @@ function initMap() {
     console.log(service);
     
     const panel = document.getElementById("campsite-panel");
-
+    const onsenPanel = document.getElementById("onsen-panel");
+    
     campsites.forEach((campsite) => {
       const marker = new google.maps.Marker({
         position: { lat: campsite.lat, lng: campsite.lng },
@@ -100,6 +101,56 @@ function initMap() {
 
               ${onsenListHtml}
             `;
+
+            const onsenButtons = panel.querySelectorAll("button");
+            onsenButtons.forEach((button) => {
+              button.addEventListener("click", () => {
+                const placeId = button.dataset.placeId;
+                console.log(placeId);
+
+                service.getDetails(
+                  {
+                    placeId: placeId,
+                    fields: [
+                      "name",
+                      "formatted_address",
+                      "website",
+                      "opening_hours"
+                    ]
+                  },
+                  (place, status) => {
+                    console.log(place);
+                    console.log(status);
+
+                    onsenPanel.innerHTML = `
+                      <h2>温泉施設情報</h2>
+
+                      <h3>${place.name}</h3>
+
+                      <p><strong>住所</strong></p>
+                      <p>${place.formatted_address || "情報なし"}</p>
+
+                      <p><strong>営業時間</strong></p>
+                      <p>
+                        ${
+                          place.opening_hours?.weekday_text?.join("<br>")
+                          || "情報なし"
+                        }
+                      </p>
+
+                      <p><strong>公式サイト</strong></p>
+                      <p>
+                        ${
+                          place.website
+                            ? `<a href="${place.website}" target="_blank">公式サイトを見る</a>`
+                            : "情報なし"
+                        }
+                      </p>
+                    `;
+                  }
+                );
+              });
+            });
           }
         );
       });
@@ -108,6 +159,8 @@ function initMap() {
     console.error("map element not found or Google Maps API not loaded");
   }
 }
+
+
 
 document.addEventListener("turbo:load", () => {
   const mapElement = document.getElementById("map");
