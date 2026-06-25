@@ -1,4 +1,4 @@
-import { campsites } from './campsites.js';
+import { campsites } from 'campsites';
 
 function initMap() {
   const center = {
@@ -159,8 +159,6 @@ function initMap() {
     console.error("map element not found or Google Maps API not loaded");
   }
 }
-
-
 
 document.addEventListener("turbo:load", () => {
   const mapElement = document.getElementById("map");
