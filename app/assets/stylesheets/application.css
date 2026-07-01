@@ -14,6 +14,10 @@
  *= require_self
  */
  
+.hidden {
+  display: none !important;
+}
+
 .search-container {
   display: flex;
   justify-content: space-between;
@@ -29,11 +33,30 @@
 #campsite-panel {
   border-right: 1px solid #ccc;
   background-color: #b8f0c057;
+  position: relative;
 }
 
-#map {
-  width: 20%;
+#close-campsite-panel {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.search-container #map {
+  width: 100%;
   height: 100%;
+}
+
+.search-container.campsite-open #map {
+  width: 60%;
+}
+
+.search-container.campsite-open.onsen-open #map {
+  width: 20%;
 }
 
 #onsen-panel {

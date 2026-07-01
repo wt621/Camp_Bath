@@ -28,6 +28,9 @@ function initMap() {
       });
 
       marker.addListener("click", () => {
+        const closeButton = document.getElementById('close-campsite-panel');
+        closeButton.classList.remove('hidden');
+        const panelContent = document.getElementById("campsite-content");
         service.nearbySearch(
           {
             location: {
@@ -82,7 +85,7 @@ function initMap() {
               </ul>
             `;
 
-            panel.innerHTML = `
+            panelContent.innerHTML = `
               <h2>キャンプ場情報</h2>
               <h3>${campsite.name}</h3>
 
@@ -102,7 +105,7 @@ function initMap() {
               ${onsenListHtml}
             `;
 
-            const onsenButtons = panel.querySelectorAll("button");
+            const onsenButtons = panelContent.querySelectorAll("button[data-place-id]");
             onsenButtons.forEach((button) => {
               button.addEventListener("click", () => {
                 const placeId = button.dataset.placeId;
@@ -122,7 +125,10 @@ function initMap() {
                     console.log(place);
                     console.log(status);
 
-                    onsenPanel.innerHTML = `
+                    onsenPanel.classList.remove('hidden');
+                    const onsenContent = document.getElementById('onsen-content');
+
+                    onsenContent.innerHTML = `
                       <h2>温泉施設情報</h2>
 
                       <h3>${place.name}</h3>
@@ -178,6 +184,7 @@ document.addEventListener("turbo:load", () => {
 
 document.addEventListener("DOMContentLoaded", () => {
   const mapElement = document.getElementById("map");
+  const onsenPanel = document.getElementById("onsen-panel");
   if (mapElement) {
     if (typeof google !== "undefined" && google.maps) {
       initMap();
@@ -189,5 +196,24 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }, 100);
     }
+  }
+  const closeButton = document.getElementById('close-campsite-panel');
+  if (closeButton) {
+    closeButton.addEventListener('click', () => {
+      console.log('×ボタンがクリックされました!');
+      
+      // 1. ✕ボタンを非表示にする
+      closeButton.classList.add('hidden');
+      
+      // 2. 温泉パネルを閉じる
+      onsenPanel.classList.add('hidden');
+      
+      // 3. キャンプ場パネルの内容を初期状態に戻す
+      const panelContent = document.getElementById("campsite-content");
+      panelContent.innerHTML = `
+        <h2>キャンプ場情報</h2>
+        <p>キャンプ場を選択してください</p>
+      `;
+    });
   }
 });
