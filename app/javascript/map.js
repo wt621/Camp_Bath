@@ -110,7 +110,7 @@ function initMap() {
               button.addEventListener("click", () => {
                 const placeId = button.dataset.placeId;
                 console.log(placeId);
-
+               
                 service.getDetails(
                   {
                     placeId: placeId,
@@ -126,7 +126,9 @@ function initMap() {
                     console.log(status);
 
                     onsenPanel.classList.remove('hidden');
-                    const onsenContent = document.getElementById('onsen-content');
+                    const closeOnsenButton = document.getElementById('close-onsen-panel');
+                        closeOnsenButton.classList.remove('hidden');
+                        const onsenContent = document.getElementById('onsen-content');
 
                     onsenContent.innerHTML = `
                       <h2>温泉施設情報</h2>
@@ -202,17 +204,30 @@ document.addEventListener("DOMContentLoaded", () => {
     closeButton.addEventListener('click', () => {
       console.log('×ボタンがクリックされました!');
       
-      // 1. ✕ボタンを非表示にする
       closeButton.classList.add('hidden');
       
-      // 2. 温泉パネルを閉じる
       onsenPanel.classList.add('hidden');
       
-      // 3. キャンプ場パネルの内容を初期状態に戻す
       const panelContent = document.getElementById("campsite-content");
       panelContent.innerHTML = `
         <h2>キャンプ場情報</h2>
         <p>キャンプ場を選択してください</p>
+      `;
+    });
+  }
+
+  const closeOnsenButton = document.getElementById('close-onsen-panel');
+  if (closeOnsenButton) {
+    closeOnsenButton.addEventListener('click', () => {
+
+      closeOnsenButton.classList.add('hidden');
+
+      onsenPanel.classList.add('hidden');
+
+      const onsenContent = document.getElementById('onsen-content');
+      onsenContent.innerHTML = `
+        <h2>温泉施設情報</h2>
+        <p>温泉を選択してください</p>
       `;
     });
   }
