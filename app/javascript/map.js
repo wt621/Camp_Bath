@@ -28,6 +28,11 @@ function initMap() {
       });
 
       marker.addListener("click", () => {
+        const searchContainer = document.querySelector(".search-container");
+        const campsitePanel = document.getElementById("campsite-panel");
+        campsitePanel.classList.remove("hidden");
+        searchContainer.classList.add("campsite-open");
+
         const closeButton = document.getElementById('close-campsite-panel');
         closeButton.classList.remove('hidden');
         const panelContent = document.getElementById("campsite-content");
@@ -107,8 +112,12 @@ function initMap() {
 
             const onsenButtons = panelContent.querySelectorAll("button[data-place-id]");
             onsenButtons.forEach((button) => {
-              button.addEventListener("click", () => {
-                const placeId = button.dataset.placeId;
+              button.addEventListener("click", () => {      
+              const placeId = button.dataset.placeId;
+
+              const searchContainer = document.querySelector(".search-container");
+              searchContainer.classList.add("onsen-open");
+
                 console.log(placeId);
                
                 service.getDetails(
@@ -203,6 +212,17 @@ document.addEventListener("DOMContentLoaded", () => {
   if (closeButton) {
     closeButton.addEventListener('click', () => {
       console.log('×ボタンがクリックされました!');
+
+      const searchContainer = document.querySelector(".search-container");
+      if (searchContainer) {
+        searchContainer.classList.remove('campsite-open');
+        searchContainer.classList.remove('onsen-open');
+      }
+
+      const campsitePanel = document.getElementById("campsite-panel");
+      if (campsitePanel) {
+        campsitePanel.classList.add('hidden');
+      }
       
       closeButton.classList.add('hidden');
       
@@ -219,6 +239,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeOnsenButton = document.getElementById('close-onsen-panel');
   if (closeOnsenButton) {
     closeOnsenButton.addEventListener('click', () => {
+
+      const searchContainer = document.querySelector(".search-container");
+      searchContainer.classList.remove("onsen-open");
 
       closeOnsenButton.classList.add('hidden');
 
