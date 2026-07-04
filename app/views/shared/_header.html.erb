@@ -1,19 +1,17 @@
-<header style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
+<header class="app-header">
   <%= link_to "Camp-Bath", root_path %>
 
   <% if user_signed_in? %>
-    <nav style="position: relative;">
-      <!-- ハンバーガーボタン -->
-      <button id="hamburger-button" style="font-size: 24px; background: none; border: none; cursor: pointer;">
+    <nav class="header-nav">
+      <button id="hamburger-button" class="hamburger-button">
         ≡
       </button>
-      
-      <!-- メニューの中身（最初は非表示） -->
-      <ul id="hamburger-menu" style="display: none; position: absolute; right: 0; top: 30px; background: white; border: 1px solid #ccc; list-style: none; padding: 10px; margin: 0;">
-        <li style="margin-bottom: 10px; white-space: nowrap;">
+
+      <ul id="hamburger-menu" class="hamburger-menu">
+        <li class="hamburger-item">
           <%= link_to "ユーザー設定", users_profile_path %>
         </li>
-        <li>
+        <li class="hamburger-item">
           <%= link_to "ログアウト", destroy_user_session_path, data: { turbo_method: :delete } %>
         </li>
       </ul>
