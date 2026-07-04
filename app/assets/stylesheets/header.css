@@ -1,0 +1,52 @@
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.header-nav {
+  position: relative;
+}
+
+.hamburger-button {
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.hamburger-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 30px;
+  background: white;
+  border: 1px solid #ccc;
+  list-style: none;
+  padding: 10px;
+  margin: 0;
+  z-index: 1000;
+}
+
+.hamburger-item {
+  margin-bottom: 10px;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .hamburger-button {
+    font-size: 32px;
+    padding: 10px;
+  }
+
+  .hamburger-menu {
+    top: 50px;
+    width: 180px;
+  }
+
+  .hamburger-item a {
+    display: block;
+    padding: 10px;
+  }
+}
