@@ -1,29 +1,29 @@
-<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh;">
-  
+<div class="profile-container">
+
   <!-- タイトル -->
   <h1>プロフィール</h1>
 
   <!-- 名前のラベル -->
-  <div style="width: 400px; text-align: left; margin-top: 20px;">
+  <div class="profile-field">
     名前
   </div>
-  
+
   <!-- 名前の枠 -->
-  <div style="border: 1px solid #ccc; padding: 15px; width: 400px; text-align: left;">
+  <div class="profile-value">
     <%= current_user.name %>
   </div>
 
   <!-- メールアドレスのラベル -->
-  <div style="width: 400px; text-align: left; margin-top: 20px;">
+  <div class="profile-field">
     メールアドレス
   </div>
-  
+
   <!-- メールアドレスの枠 -->
-  <div style="border: 1px solid #ccc; padding: 15px; width: 400px; text-align: left;">
+  <div class="profile-value">
     <%= current_user.email %>
   </div>
 
   <!-- ボタン -->
-  <%= link_to "情報を更新する", edit_user_registration_path, style: "margin-top: 20px;" %>
-  
+  <%= link_to "情報を更新する", edit_user_registration_path, class: "profile-button" %>
+
 </div>
