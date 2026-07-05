@@ -1,0 +1,26 @@
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.profile-field {
+  width: 400px;
+  max-width: 90%;
+  text-align: left;
+  margin-top: 20px;
+}
+
+.profile-value {
+  border: 1px solid #ccc;
+  padding: 15px;
+  width: 400px;
+  max-width: 90%;
+  text-align: left;
+}
+
+.profile-button {
+  margin-top: 20px;
+}
