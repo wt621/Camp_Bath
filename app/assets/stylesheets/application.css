@@ -21,7 +21,7 @@ html, body {
 body {
   font-family: Arial, sans-serif;
   text-align: center;
-  padding-bottom: 60px;  /* フッター分の余白 */
+  padding-bottom: 60px;
 }
 
 h1 {
