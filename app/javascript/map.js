@@ -16,10 +16,10 @@ function initMap() {
 
     const service = new google.maps.places.PlacesService(map);
     console.log(service);
-    
+
     const panel = document.getElementById("campsite-panel");
     const onsenPanel = document.getElementById("onsen-panel");
-    
+
     campsites.forEach((campsite) => {
       const marker = new google.maps.Marker({
         position: { lat: campsite.lat, lng: campsite.lng },
@@ -50,7 +50,7 @@ function initMap() {
 
             const campsiteLocation = new google.maps.LatLng(campsite.lat, campsite.lng);
             const resultsWithDistance = results.map(onsen => {
-            
+
             const onsenLocation = new google.maps.LatLng(
               onsen.geometry.location.lat(),
               onsen.geometry.location.lng()
@@ -73,53 +73,57 @@ function initMap() {
 
             let onsenListHtml = `
               <h3>周辺15km圏内の温泉</h3>
-              <ul>
+              <div class="detail-box">
+                <ul>
             `;
 
-            topThreeOnsens.forEach((onsen) => {
-              onsenListHtml += `
-                <li>
-                  <button data-place-id="${onsen.place_id}">
-                    ${onsen.name}
-                  </button>
-                </li>
-              `;
-            });
-
+          topThreeOnsens.forEach((onsen) => {
             onsenListHtml += `
-              </ul>
+              <li>
+                <button data-place-id="${onsen.place_id}">
+                  ${onsen.name}
+                </button>
+              </li>
             `;
+          });
+
+          onsenListHtml += `
+              </ul>
+            </div>
+          `;
 
             panelContent.innerHTML = `
               <h2>キャンプ場情報</h2>
-              <h3>${campsite.name}</h3>
+              <div class="detail-box">
+                <h3>${campsite.name}</h3>
 
-              <p><strong>住所</strong></p>
-              <p>${campsite.address}</p>
+                <p><strong>住所</strong></p>
+                <p>${campsite.address}</p>
 
-              <p><strong>営業時間</strong></p>
-              <p>${campsite.businessHours || '情報なし'}</p>
+                <p><strong>営業時間</strong></p>
+                <p>${campsite.businessHours || '情報なし'}</p>
 
-              <p><strong>サイトURL</strong></p>
-              <p>
-                ${campsite.url
-                  ? `<a href="${campsite.url}" target="_blank" rel="noopener noreferrer">公式サイトを見る</a>`
-                  : '公式サイト情報なし'}
-              </p>
+                <p><strong>サイトURL</strong></p>
+                <p>
+                  ${campsite.url
+                    ? `<a href="${campsite.url}" target="_blank" rel="noopener noreferrer">公式サイトを見る</a>`
+                    : '公式サイト情報なし'}
+                </p>
+              </div>
 
               ${onsenListHtml}
             `;
 
             const onsenButtons = panelContent.querySelectorAll("button[data-place-id]");
             onsenButtons.forEach((button) => {
-              button.addEventListener("click", () => {      
+              button.addEventListener("click", () => {
               const placeId = button.dataset.placeId;
 
               const searchContainer = document.querySelector(".search-container");
               searchContainer.classList.add("onsen-open");
 
                 console.log(placeId);
-               
+
                 service.getDetails(
                   {
                     placeId: placeId,
@@ -141,28 +145,29 @@ function initMap() {
 
                     onsenContent.innerHTML = `
                       <h2>温泉施設情報</h2>
+                      <div class="detail-box">
+                        <h3>${place.name}</h3>
 
-                      <h3>${place.name}</h3>
+                        <p><strong>住所</strong></p>
+                        <p>${place.formatted_address || "情報なし"}</p>
 
-                      <p><strong>住所</strong></p>
-                      <p>${place.formatted_address || "情報なし"}</p>
+                        <p><strong>営業時間</strong></p>
+                        <p>
+                          ${
+                            place.opening_hours?.weekday_text?.join("<br>")
+                            || "情報なし"
+                          }
+                        </p>
 
-                      <p><strong>営業時間</strong></p>
-                      <p>
-                        ${
-                          place.opening_hours?.weekday_text?.join("<br>")
-                          || "情報なし"
-                        }
-                      </p>
-
-                      <p><strong>公式サイト</strong></p>
-                      <p>
-                        ${
-                          place.website
-                            ? `<a href="${place.website}" target="_blank">公式サイトを見る</a>`
-                            : "情報なし"
-                        }
-                      </p>
+                        <p><strong>公式サイト</strong></p>
+                        <p>
+                          ${
+                            place.website
+                              ? `<a href="${place.website}" target="_blank">公式サイトを見る</a>`
+                              : "情報なし"
+                          }
+                        </p>
+                      </div>
                     `;
                   }
                 );
@@ -174,6 +179,74 @@ function initMap() {
     });
   } else {
     console.error("map element not found or Google Maps API not loaded");
+  }
+}
+
+function setupCloseButtons() {
+  const closeButton = document.getElementById('close-campsite-panel');
+  if (closeButton) {
+
+    closeButton.replaceWith(closeButton.cloneNode(true));
+    const newCloseButton = document.getElementById('close-campsite-panel');
+    
+    newCloseButton.addEventListener('click', () => {
+      console.log('×ボタンがクリックされました!');
+
+      const searchContainer = document.querySelector(".search-container");
+      if (searchContainer) {
+        searchContainer.classList.remove('campsite-open');
+        searchContainer.classList.remove('onsen-open');
+      }
+
+      const campsitePanel = document.getElementById("campsite-panel");
+      if (campsitePanel) {
+        campsitePanel.classList.add('hidden');
+      }
+
+      newCloseButton.classList.add('hidden');
+
+      const onsenPanel = document.getElementById("onsen-panel");
+      if (onsenPanel) {
+        onsenPanel.classList.add('hidden');
+      }
+
+      const panelContent = document.getElementById("campsite-content");
+      if (panelContent) {
+        panelContent.innerHTML = `
+          <h2>キャンプ場情報</h2>
+          <p>キャンプ場を選択してください</p>
+        `;
+      }
+    });
+  }
+
+  const closeOnsenButton = document.getElementById('close-onsen-panel');
+  if (closeOnsenButton) {
+
+    closeOnsenButton.replaceWith(closeOnsenButton.cloneNode(true));
+    const newCloseOnsenButton = document.getElementById('close-onsen-panel');
+    
+    newCloseOnsenButton.addEventListener('click', () => {
+      const searchContainer = document.querySelector(".search-container");
+      if (searchContainer) {
+        searchContainer.classList.remove("onsen-open");
+      }
+
+      newCloseOnsenButton.classList.add('hidden');
+
+      const onsenPanel = document.getElementById("onsen-panel");
+      if (onsenPanel) {
+        onsenPanel.classList.add('hidden');
+      }
+
+      const onsenContent = document.getElementById('onsen-content');
+      if (onsenContent) {
+        onsenContent.innerHTML = `
+          <h2>温泉施設情報</h2>
+          <p>温泉を選択してください</p>
+        `;
+      }
+    });
   }
 }
 
@@ -191,11 +264,12 @@ document.addEventListener("turbo:load", () => {
       }, 100);
     }
   }
+
+  setupCloseButtons();
 });
 
 document.addEventListener("DOMContentLoaded", () => {
   const mapElement = document.getElementById("map");
-  const onsenPanel = document.getElementById("onsen-panel");
   if (mapElement) {
     if (typeof google !== "undefined" && google.maps) {
       initMap();
@@ -208,50 +282,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }, 100);
     }
   }
-  const closeButton = document.getElementById('close-campsite-panel');
-  if (closeButton) {
-    closeButton.addEventListener('click', () => {
-      console.log('×ボタンがクリックされました!');
 
-      const searchContainer = document.querySelector(".search-container");
-      if (searchContainer) {
-        searchContainer.classList.remove('campsite-open');
-        searchContainer.classList.remove('onsen-open');
-      }
-
-      const campsitePanel = document.getElementById("campsite-panel");
-      if (campsitePanel) {
-        campsitePanel.classList.add('hidden');
-      }
-      
-      closeButton.classList.add('hidden');
-      
-      onsenPanel.classList.add('hidden');
-      
-      const panelContent = document.getElementById("campsite-content");
-      panelContent.innerHTML = `
-        <h2>キャンプ場情報</h2>
-        <p>キャンプ場を選択してください</p>
-      `;
-    });
-  }
-
-  const closeOnsenButton = document.getElementById('close-onsen-panel');
-  if (closeOnsenButton) {
-    closeOnsenButton.addEventListener('click', () => {
-
-      const searchContainer = document.querySelector(".search-container");
-      searchContainer.classList.remove("onsen-open");
-
-      closeOnsenButton.classList.add('hidden');
-
-      onsenPanel.classList.add('hidden');
-
-      const onsenContent = document.getElementById('onsen-content');
-      onsenContent.innerHTML = `
-        <h2>温泉施設情報</h2>
-        <p>温泉を選択してください</p>
-      `;
-    });
-  }
+  setupCloseButtons();
 });
