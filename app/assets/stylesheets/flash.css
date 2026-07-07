@@ -1,0 +1,39 @@
+/* フラッシュメッセージの共通スタイル */
+.flash-message {
+  position: fixed;
+  top: 20px;
+  z-index: 11;
+  margin-top: 80px;
+  padding: 15px 20px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ① notice（成功・緑系）のとき */
+.flash-message.notice {
+  background-color: #d4edda; /* 薄い緑 */
+  color: #155724;            /* 濃い緑 */
+  border-bottom: 1px solid #c3e6cb;
+}
+
+/* ② alert（失敗・赤系）のとき */
+.flash-message.alert {
+  background-color: #f8d7da; /* 薄い赤 */
+  color: #721c24;            /* 濃い赤 */
+  border-bottom: 1px solid #f5c6cb;
+}
+
+.flash-message.fade-out {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+@media (max-width: 768px) {
+  .flash-message {
+    margin-top: 80px;  /* スマホ版 */
+  }
+}
