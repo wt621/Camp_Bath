@@ -1,12 +1,10 @@
 Rails.application.routes.draw do
+  get "profile", to: "users#profile"
   get "search", to: "search#index"
   devise_for :users, controllers: {
     registrations: "users/registrations"
   }
 
-  devise_scope :user do
-    get "users/profile", to: "users/registrations#profile"
-  end
   root "maps#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
