@@ -15,5 +15,4 @@ function setupFlashMessages() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", setupFlashMessages);
-document.addEventListener("turbo:load", setupFlashMessages);
+document.addEventListener("turbo:render", setupFlashMessages);
