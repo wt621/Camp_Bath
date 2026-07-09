@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   get "profile", to: "users#profile"
   get "search", to: "search#index"
-  devise_for :users, controllers: {
+  devise_for :users, skip: [ :passwords ], controllers: {
     registrations: "users/registrations"
   }
 
