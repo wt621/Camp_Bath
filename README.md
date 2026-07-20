@@ -1,5 +1,5 @@
 # ・サービス名：Camp-Bath
-##　デプロイURL
+## デプロイURL
 - https://camp-bath.onrender.com/
 ---
 ## 1. サービス概要
