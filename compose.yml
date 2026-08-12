@@ -10,9 +10,10 @@ services:
       - "3000:3000"
     depends_on:
       - db
+      - chrome
     environment:
       DATABASE_URL: postgresql://postgres:password@db:5432/camp_bath_development
-
+      SELENIUM_DRIVER_URL: http://chrome:4444/wd/hub
   db:
     image: postgres:14
     environment:
@@ -23,6 +24,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+
+  chrome:
+    image: seleniarm/standalone-chromium:latest
+    ports:
+      - "4444:4444"
 
 volumes:
   postgres_data:
