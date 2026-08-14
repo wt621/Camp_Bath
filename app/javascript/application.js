@@ -7,10 +7,13 @@ import "flash"
 document.addEventListener('turbo:load', function() {
   const button = document.getElementById('hamburger-button');
   const menu = document.getElementById('hamburger-menu');
-  
+
   if (button && menu) {
     button.addEventListener('click', function() {
-      if (menu.style.display === 'none') {
+
+      const currentDisplay = window.getComputedStyle(menu).display;
+      
+      if (currentDisplay === 'none') {
         menu.style.display = 'block';
       } else {
         menu.style.display = 'none';
