@@ -252,3 +252,32 @@ https://www.figma.com/design/f7OCdKH04zqB0MwR4Uo9Go/%E7%94%BB%E9%9D%A2%E9%81%B7%
 
 ### 12.ER図:drawio URL
 https://drive.google.com/file/d/1KQp0A4VA_nSbXO6bgZRg-MqKPUn_vc7E/view?usp=sharing
+
+
+### 13.テスト
+RSpecを使用してモデル・リクエスト・システムテストを実施しています。
+
+### テスト実行
+
+```bash
+docker compose exec web bundle exec rspec
+テストカバレッジ
+SimpleCovを使用してテストカバレッジを測定しています。
+RSpec実行時にカバレッジレポートが生成されます。
+
+docker compose exec web bundle exec rspec
+
+カバレッジレポート：coverage/index.html
+
+現在のカバレッジ：58.7%
+
+カバレッジの内訳
+Userモデル：バリデーションのテスト
+Request Spec：検索画面、プロフィール画面のテスト
+System Spec：ユーザー登録、ログイン、ハンバーガーメニュー、検索画面への遷移、地図表示エリアのテスト
+未テストの箇所
+以下は意図的にテスト対象外としています：
+
+Deviseが提供する機能（外部Gemの動作）
+Google Maps APIの動作（外部サービス）
+JavaScriptの動作（System Specの範囲外）
