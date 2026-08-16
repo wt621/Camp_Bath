@@ -6,21 +6,61 @@ on:
     branches: [ main ]
 
 jobs:
-#  scan_ruby:
-#    runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-latest
 
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v4
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: camp_bath_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
-#      - name: Set up Ruby
-#        uses: ruby/setup-ruby@v1
-#        with:
-#          ruby-version: .ruby-version
-#          bundler-cache: true
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: postgresql://postgres:password@localhost:5432/camp_bath_test
 
-#      - name: Scan for common Rails security vulnerabilities using static analysis
-#        run: bin/brakeman --no-pager
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Set up database
+        run: |
+          bin/rails db:create
+          bin/rails db:schema:load
+
+      - name: Run RSpec
+        run: bundle exec rspec
+
+  scan_ruby:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Scan for common Rails security vulnerabilities using static analysis
+        run: bin/brakeman --no-pager
 
   scan_js:
     runs-on: ubuntu-latest
@@ -52,4 +92,4 @@ jobs:
 
       - name: Lint code for consistent style
         run: bin/rubocop -f github
-
+        
