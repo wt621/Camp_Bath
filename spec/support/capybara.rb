@@ -18,7 +18,7 @@ if ENV['CI']
     )
   end
 else
-  
+
   Capybara.register_driver :remote_chrome do |app|
     options = Selenium::WebDriver::Chrome::Options.new
     options.add_argument('no-sandbox')
