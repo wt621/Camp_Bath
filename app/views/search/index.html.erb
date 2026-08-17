@@ -1,8 +1,8 @@
 <% content_for :head do %>
   <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&libraries=places,geometry&v=weekly" defer></script>
-  <% end %>
+<% end %>
 
-<div class="search-container"> 
+<div class="search-container">
   <div id="campsite-panel" class="side-panel hidden">
     <button id="close-campsite-panel" class="close-button hidden">×</button>
     <div id="campsite-content">
