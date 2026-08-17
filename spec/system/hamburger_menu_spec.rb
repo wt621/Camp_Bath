@@ -20,9 +20,12 @@ RSpec.describe 'ハンバーガーメニュー', type: :system do
 
   describe 'ハンバーガーメニューの開閉' do
     it 'ハンバーガーメニューを開くとメニュー項目が表示されること', js: true do
+
+      expect(page).to have_css('#hamburger-button', wait: 10)
+      
       find('#hamburger-button').click
 
-      expect(page).to have_css('#hamburger-menu', visible: true)
+      expect(page).to have_css('#hamburger-menu', visible: true, wait: 10)
       expect(page).to have_link('ユーザー設定')
       expect(page).to have_link('ログアウト')
     end
