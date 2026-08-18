@@ -1,5 +1,6 @@
 function initMap() {
-  const center = {
+
+  const center = window.searchCenter || {
     lat: 35.681236,
     lng: 139.767125
   };
@@ -16,14 +17,14 @@ function initMap() {
 
     const isCampsite = (place) => {
       const name = place.name || '';
-  
+
       const excludeWords = ['株式会社', '会社', 'ラボラトリー', 'オペレーション', '小貝川リバーサイドパーク', '生牧草専門 中央牧草センター'];
       const hasExcludeWord = excludeWords.some(word => name.includes(word));
-  
+
       if (hasExcludeWord) {
         return false;
       }
-  
+
       return true;
     };
 
@@ -142,7 +143,7 @@ function initMap() {
         }
       }
     );
-  
+
 function setupOnsenClickEvents(onsens) {
   const onsenItems = document.querySelectorAll('.onsen-item');
 
@@ -150,7 +151,7 @@ function setupOnsenClickEvents(onsens) {
     item.addEventListener('click', () => {
       const placeId = item.getAttribute('data-place-id');
       const selectedOnsen = onsens.find(onsen => onsen.place_id === placeId);
-      
+
       if (selectedOnsen) {
         service.getDetails(
           {

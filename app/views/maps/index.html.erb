@@ -5,7 +5,7 @@
       <%= link_to "新規登録", new_user_registration_path, class: "btn-search-top" %>
     <% end %>
 
-    <%= link_to "検索する", search_path, class: "btn-search-top" %>
+    <%= link_to "検索する", search_regions_path, class: "btn-search-top" %>
 
     <% if user_signed_in? %>
       <%= button_to "ログアウト", destroy_user_session_path, method: :delete, class: "btn-search-top" %>
@@ -14,4 +14,3 @@
     <% end %>
   </div>
 </div>
-

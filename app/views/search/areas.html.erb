@@ -1,0 +1,14 @@
+<div class="container">
+  <% prefecture_name = AreaData.prefectures_by_region(@region_key.to_sym)[@prefecture_key.to_sym][:name] rescue @prefecture_key %>
+  <h1><%= prefecture_name %> - エリアを選択してください</h1>
+
+  <ul>
+    <% @areas.each do |area| %>
+      <li>
+        <%= link_to area[:name], search_path(latitude: area[:latitude], longitude: area[:longitude]) %>
+      </li>
+    <% end %>
+  </ul>
+
+  <%= link_to '都道府県選択に戻る', search_prefectures_path(region: @region_key) %>
+</div>
