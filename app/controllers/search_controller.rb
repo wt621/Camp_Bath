@@ -1,6 +1,6 @@
 class SearchController < ApplicationController
   skip_before_action :authenticate_user!
-  
+
   def regions
     @regions = AreaData.all_regions
   end
