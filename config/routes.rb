@@ -3,7 +3,7 @@ Rails.application.routes.draw do
 
   get "search/regions", to: "search#regions", as: :search_regions
   get "search/prefectures", to: "search#prefectures", as: :search_prefectures
-  
+
   get "search/areas", to: "search#areas", as: :search_areas
   get "search", to: "search#index", as: :search
   devise_for :users, skip: [ :passwords ], controllers: {
