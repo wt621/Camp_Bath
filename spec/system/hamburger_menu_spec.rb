@@ -4,14 +4,8 @@ RSpec.describe 'ハンバーガーメニュー', type: :system do
   let(:user) { create(:user) }
 
   before do
-    visit new_user_session_path
-
-    fill_in 'Eメール', with: user.email
-    fill_in 'パスワード', with: user.password
-
-    click_button 'ログイン'
-
-    expect(page).to have_current_path(root_path, wait: 10)
+    sign_in user
+    visit root_path
   end
 
   describe 'ハンバーガーボタンの表示' do
