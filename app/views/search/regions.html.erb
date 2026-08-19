@@ -1,9 +1,17 @@
-<div class="container">
-  <h1>地方を選択してください</h1>
-<ul>
-  <% @regions.each do |region_key, region_data| %>
-    <li>
-      <%= link_to region_data[:name], search_prefectures_path(region: region_key) %>
-    </li>
-  <% end %>
-</ul>
+<div class="region-selection-container">
+  <div class="container">
+    <h1 class="region-title">地方を選択してください</h1>
+
+    <ul class="region-button-list">
+      <% @regions.each do |region_key, region_data| %>
+        <li>
+          <%= link_to region_data[:name], search_prefectures_path(region: region_key), class: "region-button" %>
+        </li>
+      <% end %>
+    </ul>
+
+    <div class="back-link-wrapper">
+      <%= link_to 'トップに戻る', root_path, class: "back-link" %>
+    </div>
+  </div>
+</div>

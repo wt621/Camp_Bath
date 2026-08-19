@@ -1,14 +1,18 @@
-<div class="container">
-  <% prefecture_name = AreaData.prefectures_by_region(@region_key.to_sym)[@prefecture_key.to_sym][:name] rescue @prefecture_key %>
-  <h1><%= prefecture_name %> - エリアを選択してください</h1>
+<div class="region-selection-container">
+  <div class="container">
+    <% prefecture_name = AreaData.prefectures_by_region(@region_key.to_sym)[@prefecture_key.to_sym][:name] rescue @region_key %>
+    <h1 class="region-title"><%= prefecture_name %> - エリアを選択してください</h1>
 
-  <ul>
-    <% @areas.each do |area| %>
-      <li>
-        <%= link_to area[:name], search_path(latitude: area[:latitude], longitude: area[:longitude]) %>
-      </li>
-    <% end %>
-  </ul>
+    <ul class="region-button-list">
+      <% @areas.each do |area| %>
+        <li>
+          <%= link_to area[:name], search_path(latitude: area[:latitude], longitude: area[:longitude]), class: "region-button" %>
+        </li>
+      <% end %>
+    </ul>
 
-  <%= link_to '都道府県選択に戻る', search_prefectures_path(region: @region_key) %>
+    <div class="back-link-wrapper">
+      <%= link_to '都道府県選択に戻る', search_prefectures_path(region: @region_key), class: "back-link" %>
+    </div>
+  </div>
 </div>
