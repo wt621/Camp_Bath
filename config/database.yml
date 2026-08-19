@@ -8,13 +8,13 @@ default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  host: db
-  username: postgres
-  password: password
 
 development:
   <<: *default
   database: camp_bath_development
+  host: db
+  username: postgres
+  password: password
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -22,6 +22,9 @@ development:
 test:
   <<: *default
   database: camp_bath_test
+  host: db
+  username: postgres
+  password: password
 
 # SQLite3 write its data on the local filesystem, as such it requires
 # persistent disks. If you are deploying to a managed service, you should
@@ -30,7 +33,6 @@ test:
 # Similarly, if you deploy your application as a Docker container, you must
 # ensure the database is located in a persisted volume.
 production:
-  adapter: postgresql
-  encoding: unicode
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  <<: *default
   url: <%= ENV['DATABASE_URL'] %>
+  
