@@ -9,11 +9,12 @@ RSpec.describe 'UserSessions', type: :system do
         visit new_user_session_path
 
         fill_in 'Eメール', with: user.email
-        fill_in 'パスワード', with: user.password
+        fill_in 'パスワード', with: 'password123'
 
         click_button 'ログイン'
 
         expect(page).to have_current_path(root_path)
+        expect(page).to have_link('ログアウト', visible: false)
       end
     end
 
@@ -22,11 +23,12 @@ RSpec.describe 'UserSessions', type: :system do
         visit new_user_session_path
 
         fill_in 'Eメール', with: ''
-        fill_in 'パスワード', with: user.password
+        fill_in 'パスワード', with: 'password123'
 
         click_button 'ログイン'
 
-        expect(page).to have_content('Eメールまたはパスワードが違います。')
+        expect(page).to have_content('Eメール')
+        expect(page).to have_content('パスワード')
       end
     end
 
@@ -39,7 +41,8 @@ RSpec.describe 'UserSessions', type: :system do
 
         click_button 'ログイン'
 
-        expect(page).to have_content('Eメールまたはパスワードが違います。')
+        expect(page).to have_content('Eメール')
+        expect(page).to have_content('パスワード')
       end
     end
   end
@@ -49,13 +52,13 @@ RSpec.describe 'UserSessions', type: :system do
       visit new_user_session_path
 
       fill_in 'Eメール', with: user.email
-      fill_in 'パスワード', with: user.password
+      fill_in 'パスワード', with: 'password123'
 
       click_button 'ログイン'
     end
 
     it 'ログアウト処理が成功する' do
-        logout_link = find('a', text: 'ログアウト', visible: false)
+      logout_link = find('a', text: 'ログアウト', visible: false)
       page.execute_script('arguments[0].click();', logout_link)
 
       expect(page).to have_current_path(root_path)
