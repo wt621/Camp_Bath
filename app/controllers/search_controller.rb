@@ -20,5 +20,10 @@ class SearchController < ApplicationController
   def index
     @latitude = params[:latitude] || 35.681236
     @longitude = params[:longitude] || 139.767125
+
+    @campsites = CampsiteSearchService.new(
+      latitude: @latitude,
+      longitude: @longitude
+    ).call
   end
 end
