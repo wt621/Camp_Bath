@@ -6,14 +6,16 @@ services:
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
     volumes:
       - .:/app
+      - bundle_data:/usr/local/bundle:cached
     ports:
       - "3000:3000"
     depends_on:
       - db
       - chrome
     environment:
-      DATABASE_URL: postgresql://postgres:password@db:5432/camp_bath_development
-      SELENIUM_DRIVER_URL: http://chrome:4444/wd/hub
+      DATABASE_URL: ${DATABASE_URL}
+      SELENIUM_DRIVER_URL: ${SELENIUM_DRIVER_URL}
+      SENTRY_DSN: ${SENTRY_DSN}
   db:
     image: postgres:14
     environment:
@@ -32,3 +34,4 @@ services:
 
 volumes:
   postgres_data:
+  bundle_data:
