@@ -1,3 +1,5 @@
+let map;
+
 function initMap() {
 
   const center = window.searchCenter || {
@@ -8,7 +10,7 @@ function initMap() {
   const mapElement = document.getElementById("map");
 
   if (mapElement && typeof google !== "undefined" && google.maps) {
-    const map = new google.maps.Map(mapElement, {
+    map = new google.maps.Map(mapElement, {
       zoom: 8,
       center: center
     });
@@ -58,6 +60,12 @@ function initMap() {
               const searchContainer = document.querySelector(".search-container");
               panel.classList.remove("hidden");
               searchContainer.classList.add("campsite-open");
+
+              setTimeout(() => {
+                const center = map.getCenter();
+                google.maps.event.trigger(map, "resize");
+                map.setCenter(center);
+              }, 0);
 
               const closeButton = document.getElementById('close-campsite-panel');
               closeButton.classList.remove('hidden');
@@ -165,6 +173,12 @@ function setupOnsenClickEvents(onsens) {
               onsenPanel.classList.remove("hidden");
               searchContainer.classList.add("onsen-open");
 
+              setTimeout(() => {
+                const center = map.getCenter();
+                google.maps.event.trigger(map, "resize");
+                map.setCenter(center);
+              }, 0);
+
               const closeOnsenButton = document.getElementById('close-onsen-panel');
               closeOnsenButton.classList.remove('hidden');
 
@@ -228,6 +242,12 @@ function setupCloseButtons() {
           <p>キャンプ場を選択してください</p>
         `;
       }
+
+      setTimeout(() => {
+        const center = map.getCenter();
+        google.maps.event.trigger(map, "resize");
+        map.setCenter(center);
+      }, 0);
     });
   }
 
@@ -256,6 +276,11 @@ function setupCloseButtons() {
           <p>温泉を選択してください</p>
         `;
       }
+      setTimeout(() => {
+        const center = map.getCenter();
+        google.maps.event.trigger(map, "resize");
+        map.setCenter(center);
+      }, 0);
     });
   }
 }
