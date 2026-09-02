@@ -52,14 +52,6 @@ jobs:
       - name: Run RSpec
         run: bundle exec rspec --order random
 
-      - name: Run User Sessions Spec
-        if: always()
-        run: bundle exec rspec spec/system/user_sessions_spec.rb
-
-      - name: Run Search Navigation Spec
-        if: always()
-        run: bundle exec rspec spec/system/search_navigation_spec.rb
-
       - name: Upload Capybara screenshots and test log
         if: failure()
         uses: actions/upload-artifact@v4
