@@ -50,7 +50,7 @@ jobs:
           bin/rails db:schema:load
 
       - name: Run RSpec
-        run: bundle exec rspec
+        run: bundle exec rspec --order random
 
       - name: Run User Sessions Spec
         if: always()
