@@ -51,6 +51,15 @@ jobs:
 
       - name: Run RSpec
         run: bundle exec rspec
+      
+      - name: Upload Capybara screenshots and test log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capybara-failure
+          path: |
+            tmp/capybara/
+            log/test.log
 
   scan_ruby:
     runs-on: ubuntu-latest
