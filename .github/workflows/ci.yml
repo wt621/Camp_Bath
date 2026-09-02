@@ -51,6 +51,10 @@ jobs:
 
       - name: Run RSpec
         run: bundle exec rspec
+
+      - name: Run User Sessions Spec
+        if: always()
+        run: bundle exec rspec spec/system/user_sessions_spec.rb
       
       - name: Upload Capybara screenshots and test log
         if: failure()
