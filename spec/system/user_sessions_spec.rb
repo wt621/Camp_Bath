@@ -37,8 +37,8 @@ RSpec.describe 'UserSessions', type: :system do
       it 'ログイン処理が失敗する' do
         visit new_user_session_path
 
-        fill_in 'Eメール', with: ''
-        fill_in 'パスワード', with: password
+        fill_in 'Eメール', with: user.email
+        fill_in 'パスワード', with: ''
 
         click_button 'ログイン'
 
