@@ -1,0 +1,148 @@
+.search-container {
+  display: flex;
+  width: 100%;
+  height: calc(100vh - 120px);
+  overflow: hidden;
+}
+
+.side-panel {
+  height: 100%;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+
+#map-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+.side-panel.hidden {
+  display: none;
+}
+
+#campsite-panel {
+  width: 30%;
+  border-right: 1px solid #ccc;
+  background-color: #b8f0c057;
+  position: relative;
+}
+
+.search-container.campsite-open #map-container {
+  width: 70%;
+  flex: 0 0 70%;
+}
+
+.search-container.campsite-open.onsen-open #map-container {
+  width: 40%;
+  flex: 0 0 40%;
+}
+
+.search-container.campsite-open.onsen-open #campsite-panel,
+.search-container.campsite-open.onsen-open #onsen-panel {
+  width: 30%;
+  flex: 0 0 30%;
+}
+
+#onsen-panel {
+  border-left: 1px solid #ccc;
+  background-color: #ffebb565;
+}
+
+#close-campsite-panel {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+#current-location-button {
+  position: absolute;
+  right: 10px;
+  bottom: 160px;
+
+  width: 48px;
+  height: 48px;
+
+  border: none;
+  border-radius: 50%;
+  background-color: white;
+
+  font-size: 24px;
+  cursor: pointer;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+  .search-container {
+    flex-direction: column;
+    height: calc(100vh - 120px);
+  }
+
+  .side-panel {
+    width: 100%;
+    padding: 20px;
+  }
+
+  #map-container {
+    order: 1;
+    width: 100%;
+    height: 100%;
+  }
+
+  #map {
+    width: 100%;
+    height: 100%;
+  }
+
+  #campsite-panel {
+    order: 2;
+    width: 100%;
+    height: 70vh;
+    overflow-y: auto;
+  }
+
+  #onsen-panel {
+    order: 3;
+    width: 100%;
+  }
+
+  .search-container.campsite-open #map-container,
+  .search-container.campsite-open.onsen-open #map-container {
+    width: 100%;
+    height: 30vh;
+    flex: none;
+  }
+
+  .search-container.campsite-open #campsite-panel {
+    width: 100%;
+    height: 70vh;
+  }
+
+  .search-container.campsite-open.onsen-open #campsite-panel {
+    width: 100%;
+    height: 70vh;
+  }
+
+  .search-container.campsite-open.onsen-open #onsen-panel {
+    width: 100%;
+  }
+
+  #close-campsite-panel {
+    font-size: 32px;
+    padding: 10px;
+    z-index: 10;
+  }
+}

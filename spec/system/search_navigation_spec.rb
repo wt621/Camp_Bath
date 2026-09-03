@@ -16,7 +16,9 @@ RSpec.describe '検索画面への遷移', type: :system do
   it '都道府県選択からエリア選択へ遷移できること' do
     visit search_prefectures_path(region: 'kanto')
     click_link '東京都'
-    expect(page).to have_current_path(search_areas_path(region: 'kanto', prefecture: 'tokyo'))
+    expect(page).to have_current_path(
+      search_areas_path(region: 'kanto', prefecture: 'tokyo')
+    )
   end
 
   it 'エリア選択から地図画面へ遷移できること' do

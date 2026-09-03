@@ -1,18 +1,11 @@
 /*
- * This is a manifest file that'll be compiled into application.css, which will include all the files
- * listed below.
- *
- * Any CSS (and SCSS, if configured) file within this directory, lib/assets/stylesheets, or any plugin's
- * vendor/assets/stylesheets directory can be referenced here using a relative path.
- *
- * You're free to add application-wide styles to this file and they'll appear at the bottom of the
- * compiled file so the styles you add here take precedence over styles defined in any other CSS
- * files in this directory. Styles in this file should be added after the last require_* statement.
- * It is generally better to create a new file per style scope.
+ * This is a manifest file that'll be compiled into application.css
+ * which will include all files listed below.
  *
  *= require_tree .
  *= require_self
  */
+
 html, body {
   margin: 0;
   padding: 0;
@@ -40,116 +33,4 @@ p {
 
 .hidden {
   display: none !important;
-}
-
-.search-container {
-  display: flex;
-  justify-content: space-between;
-  height: calc(100vh - 120px);
-}
-
-.side-panel {
-  width: 40%;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-#campsite-panel {
-  border-right: 1px solid #ccc;
-  background-color: #b8f0c057;
-  position: relative;
-}
-
-#close-campsite-panel {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  z-index: 10;
-}
-
-.search-container #map {
-  width: 100%;
-  height: 100%;
-}
-
-.search-container.campsite-open #map {
-  width: 60%;
-}
-
-.search-container.campsite-open.onsen-open #map {
-  width: 20%;
-}
-
-#onsen-panel {
-  border-left: 1px solid #ccc;
-  background-color: #ffebb565;
-}
-
-
-
-@media (max-width: 768px) {
-  .search-container {
-    flex-direction: column;
-    height: 100vh;
-  }
-
-  .side-panel {
-    width: 100%;
-    padding: 20px;
-  }
-
-  #map {
-    order: 1;
-  }
-
-  #campsite-panel {
-    order: 2;
-  }
-
-  #onsen-panel {
-    order: 3;
-  }
-
-  .search-container #map {
-    width: 100%;
-    height: 100vh;
-  }
-
-  .search-container.campsite-open #map {
-    width: 100%;
-    height: 30vh;
-  }
-
-  .search-container.campsite-open #campsite-panel {
-    display: block;
-    width: 100%;
-    height: 70vh;
-    overflow-y: auto;
-  }
-
-  .search-container.campsite-open.onsen-open #map {
-    width: 100%;
-    height: 30vh;
-  }
-
-  .search-container.campsite-open.onsen-open #campsite-panel {
-    width: 100%;
-    height: 70vh;
-    overflow-y: auto;
-  }
-
-  .search-container.campsite-open.onsen-open #onsen-panel {
-    display: block;
-    width: 100%;
-  }
-
-  #close-campsite-panel {
-    font-size: 32px;
-    padding: 10px;
-    z-index: 10;
-  }
 }
