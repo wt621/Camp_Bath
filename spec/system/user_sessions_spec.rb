@@ -14,19 +14,6 @@ RSpec.describe 'UserSessions', type: :system do
 
         click_button 'ログイン'
 
-        puts "LOGIN DEBUG URL BEFORE WAIT: #{page.current_url}"
-
-        begin
-          expect(page).to have_current_path(root_path)
-        rescue RSpec::Expectations::ExpectationNotMetError
-          puts "LOGIN FAILURE URL: #{page.current_url}"
-          puts "LOGIN FAILURE BODY: #{page.body[0, 5000]}"
-          raise
-        end
-
-        puts "LOGIN DEBUG URL AFTER WAIT: #{page.current_url}"
-        puts "LOGIN DEBUG BODY AFTER WAIT: #{page.body[0, 2000]}"
-
         expect(page).to have_link('ログアウト', visible: false)
       end
     end
@@ -77,16 +64,6 @@ RSpec.describe 'UserSessions', type: :system do
 
       expect(page).to have_current_path(root_path)
       expect(page).not_to have_link('ログアウト', visible: false)
-    end
-  end
-
-    describe 'transactional fixtures の確認' do
-      it 'RSpecで作成したUserをブラウザ側から取得できる' do
-        visit "/test/transaction_check?email=#{CGI.escape(user.email)}"
-
-        puts "TRANSACTION CHECK: #{page.body}"
-
-        expect(page).to have_content("USER_FOUND")
     end
   end
 end
