@@ -11,8 +11,8 @@ Rails.application.routes.draw do
   devise_for :users, skip: [ :passwords ], controllers: {
     registrations: "users/registrations"
   }
-  get '/test/transaction_check', to: 'test_transactions#check'
-  
+  get "/test/transaction_check", to: "test_transactions#check"
+
   root "maps#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
