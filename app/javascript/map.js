@@ -1,3 +1,6 @@
+const FACILITY_SEARCH_RADIUS = 10000;
+const FACILITY_RESULT_COUNT = 3;
+
 let map;
 let currentLocationMarker;
 let campsiteMarkers = [];
@@ -202,19 +205,20 @@ function openCampsiteDetails(
         return;
       }
 
-      searchNearbyOnsens(
+      searchNearbyFacilities(
         place,
-        service
+        service,
+        "onsen"
       );
     }
   );
 }
 
-function searchNearbyOnsens(
+function searchNearbyFacilities(
   campsite,
-  service
+  service,
+  facilityType
 ) {
-
   const panelContent =
     document.getElementById(
       "campsite-content"
@@ -224,122 +228,44 @@ function searchNearbyOnsens(
     return;
   }
 
-  service.nearbySearch(
-    {
-      location:
-        campsite.geometry.location,
+  const renderFacilityList = (
+    facilities,
+    title
+  ) => {
+    if (facilities.length === 0) {
+      return `
+        <h2>
+          ${title}
+        </h2>
 
-      radius: 10000,
+        <p>
+          近くに施設が見つかりませんでした
+        </p>
+      `;
+    }
 
-      keyword: "温泉"
-    },
+    let listHTML = `
+      <h2>
+        ${title}
+      </h2>
 
-    (results, status) => {
+      <div class="facility-list">
+    `;
 
-      let onsenListHTML = "";
-      let topThreeOnsens = [];
+    facilities.forEach(facility => {
+      const distanceKm =
+        (
+          facility.distance / 1000
+        ).toFixed(1);
 
-      if (
-        status ===
-          google.maps.places.PlacesServiceStatus.OK &&
-        results.length > 0
-      ) {
-
-        const resultsWithDistance =
-          results.map(onsen => {
-
-            const distanceInMeters =
-              google.maps.geometry.spherical
-                .computeDistanceBetween(
-                  campsite.geometry.location,
-                  onsen.geometry.location
-                );
-
-            return {
-              ...onsen,
-              distance: distanceInMeters
-            };
-          });
-
-        const sortedResults =
-          resultsWithDistance.sort(
-            (a, b) =>
-              a.distance - b.distance
-          );
-
-        topThreeOnsens =
-          sortedResults.slice(
-            0,
-            3
-          );
-
-        onsenListHTML = `
-          <h2>付近の温泉施設情報</h2>
-
-          <div class="onsen-list">
-        `;
-
-        topThreeOnsens.forEach(
-          onsen => {
-
-            const distanceKm =
-              (
-                onsen.distance / 1000
-              ).toFixed(1);
-
-            onsenListHTML += `
-              <div
-                class="onsen-item detail-box"
-                data-place-id="${onsen.place_id}"
-              >
-
-                <h3>
-                  ${onsen.name}
-                </h3>
-
-                <p>
-                  <strong>住所</strong>
-                </p>
-
-                <p class="onsen-address">
-                  ${
-                    onsen.vicinity ||
-                    "住所情報なし"
-                  }
-                </p>
-
-                <p class="onsen-distance">
-                  キャンプ場から約 ${distanceKm} km
-                </p>
-
-              </div>
-            `;
-          }
-        );
-
-        onsenListHTML += `
-          </div>
-        `;
-
-      } else {
-
-        onsenListHTML = `
-          <h2>付近の温泉施設情報</h2>
-
-          <p>
-            近くに温泉が見つかりませんでした
-          </p>
-        `;
-      }
-
-      panelContent.innerHTML = `
-
-        <h2>キャンプ場情報</h2>
-
-        <div class="detail-box">
+      listHTML += `
+        <div
+          class="facility-item detail-box"
+          data-place-id="${facility.place_id}"
+        >
 
           <h3>
-            ${campsite.name}
+            ${facility.name}
           </h3>
 
           <p>
@@ -348,77 +274,374 @@ function searchNearbyOnsens(
 
           <p>
             ${
-              campsite.formatted_address ||
-              "情報なし"
+              facility.vicinity ||
+              "住所情報なし"
             }
           </p>
 
           <p>
-            <strong>営業時間</strong>
+            キャンプ場から約
+            ${distanceKm} km
           </p>
-
-          <p>
-            ${
-              campsite.opening_hours
-                ? campsite.opening_hours.weekday_text.join("<br>")
-                : "情報なし"
-            }
-          </p>
-
-          <p>
-            <strong>公式サイト</strong>
-          </p>
-
-          <p>
-            ${
-              campsite.website
-                ? `<a href="${campsite.website}" target="_blank">ウェブサイトを見る</a>`
-                : "情報なし"
-            }
-          </p>
-
-          <button
-            id="campsite-image-open-button"
-            type="button"
-            class="campsite-image-button"
-          >
-            キャンプ場の画像を見る
-          </button>
-
-          <button
-            id="weather-open-button"
-            type="button"
-            class="campsite-image-button"
-          >
-            キャンプ場の天気を見る
-          </button>
 
         </div>
-
-        ${onsenListHTML}
-
       `;
+    });
 
-      setupCampsiteImageButton(
-        campsite
-      );
+    listHTML += `
+      </div>
+    `;
 
-      setupWeatherButton(
-        campsite
-      );
+    return listHTML;
+  };
 
-      if (
-        topThreeOnsens.length > 0
-      ) {
+  const renderCampsiteContent = (
+    facilityListHTML,
+    activeFacilityType
+  ) => {
+    panelContent.innerHTML = `
+      <h2>
+        キャンプ場情報
+      </h2>
 
-        setupOnsenClickEvents(
-          topThreeOnsens,
+      <div class="detail-box">
+
+        <h3>
+          ${campsite.name}
+        </h3>
+
+        <p>
+          <strong>住所</strong>
+        </p>
+
+        <p>
+          ${
+            campsite.formatted_address ||
+            "情報なし"
+          }
+        </p>
+
+        <p>
+          <strong>営業時間</strong>
+        </p>
+
+        <p>
+          ${
+            campsite.opening_hours
+              ? campsite.opening_hours.weekday_text.join("<br>")
+              : "情報なし"
+          }
+        </p>
+
+        <p>
+          <strong>公式サイト</strong>
+        </p>
+
+        <p>
+          ${
+            campsite.website
+              ? `<a href="${campsite.website}" target="_blank">ウェブサイトを見る</a>`
+              : "情報なし"
+          }
+        </p>
+
+        <button
+          id="campsite-image-open-button"
+          type="button"
+          class="campsite-image-button"
+        >
+          キャンプ場の画像を見る
+        </button>
+
+        <button
+          id="weather-open-button"
+          type="button"
+          class="campsite-image-button"
+        >
+          キャンプ場の天気を見る
+        </button>
+
+      </div>
+
+      <div class="facility-tabs">
+
+        <button
+          type="button"
+          class="facility-tab ${
+            activeFacilityType === "onsen"
+              ? "active"
+              : ""
+          }"
+          data-facility-type="onsen"
+        >
+          温泉
+        </button>
+
+        <button
+          type="button"
+          class="facility-tab ${
+            activeFacilityType === "commercial"
+              ? "active"
+              : ""
+          }"
+          data-facility-type="commercial"
+        >
+          商業施設
+        </button>
+
+      </div>
+
+      <div id="facility-list">
+        ${facilityListHTML}
+      </div>
+    `;
+
+    setupCampsiteImageButton(
+      campsite
+    );
+
+    setupWeatherButton(
+      campsite
+    );
+
+    setupFacilityTabs(
+      campsite,
+      service
+    );
+  };
+
+  if (facilityType === "onsen") {
+    service.nearbySearch(
+      {
+        location:
+          campsite.geometry.location,
+
+        radius:
+          FACILITY_SEARCH_RADIUS,
+
+        keyword:
+          "温泉"
+      },
+
+      (results, status) => {
+        let topFacilities = [];
+
+        if (
+          status ===
+            google.maps.places.PlacesServiceStatus.OK &&
+          results &&
+          results.length > 0
+        ) {
+          topFacilities =
+            results
+              .filter(
+                facility =>
+                  facility.geometry &&
+                  facility.geometry.location
+              )
+              .map(facility => {
+                const distance =
+                  google.maps.geometry.spherical
+                    .computeDistanceBetween(
+                      campsite.geometry.location,
+                      facility.geometry.location
+                    );
+
+                return {
+                  ...facility,
+                  distance
+                };
+              })
+              .sort(
+                (a, b) =>
+                  a.distance - b.distance
+              )
+              .slice(
+                0,
+                FACILITY_RESULT_COUNT
+              );
+        }
+
+        const listHTML =
+          renderFacilityList(
+            topFacilities,
+            "付近の温泉施設情報"
+          );
+
+        renderCampsiteContent(
+          listHTML,
+          "onsen"
+        );
+
+        setupFacilityClickEvents(
+          topFacilities,
           service,
-          campsite
+          campsite,
+          "onsen"
         );
       }
+    );
+
+    return;
+  }
+
+  if (facilityType === "commercial") {
+    searchCommercialFacilities(
+      campsite,
+      service,
+      renderFacilityList,
+      renderCampsiteContent
+    );
+  }
+}
+
+function searchCommercialFacilities(
+  campsite,
+  service,
+  renderFacilityList,
+  renderCampsiteContent
+) {
+
+  const searchPlace = placeType => {
+    return new Promise(resolve => {
+      service.nearbySearch(
+        {
+          location:
+            campsite.geometry.location,
+
+          radius:
+            FACILITY_SEARCH_RADIUS,
+
+          type: placeType
+        },
+
+        (results, status) => {
+          if (
+            status !==
+            google.maps.places.PlacesServiceStatus.OK
+          ) {
+            resolve([]);
+            return;
+          }
+
+          resolve(results || []);
+        }
+      );
+    });
+  };
+
+  Promise.all([
+    searchPlace("supermarket"),
+    searchPlace("convenience_store")
+  ]).then(
+    ([supermarkets, convenienceStores]) => {
+      const allFacilities = [
+        ...supermarkets,
+        ...convenienceStores
+      ];
+
+      const uniqueFacilities =
+        Array.from(
+          new Map(
+            allFacilities
+              .filter(
+                facility => facility.place_id
+              )
+              .map(
+                facility => [
+                  facility.place_id,
+                  facility
+                ]
+              )
+          ).values()
+        );
+
+      const facilitiesWithDistance =
+        uniqueFacilities
+          .filter(
+            facility =>
+              facility.geometry &&
+              facility.geometry.location
+          )
+          .map(facility => {
+            const distance =
+              google.maps.geometry.spherical
+                .computeDistanceBetween(
+                  campsite.geometry.location,
+                  facility.geometry.location
+                );
+
+            return {
+              ...facility,
+              distance
+            };
+          })
+          .sort(
+            (a, b) =>
+              a.distance - b.distance
+          )
+          .slice(
+            0,
+            FACILITY_RESULT_COUNT
+          );
+
+      const listHTML =
+        renderFacilityList(
+          facilitiesWithDistance,
+          "付近の商業施設情報"
+        );
+
+      renderCampsiteContent(
+        listHTML,
+        "commercial"
+      );
+
+      setupFacilityClickEvents(
+        facilitiesWithDistance,
+        service,
+        campsite,
+        "commercial"
+      );
     }
   );
+}
+
+function setupFacilityTabs(
+  campsite,
+  service
+) {
+  const tabs =
+    document.querySelectorAll(
+      ".facility-tab"
+    );
+
+  tabs.forEach(tab => {
+    tab.addEventListener(
+      "click",
+      () => {
+        const facilityType =
+          tab.getAttribute(
+            "data-facility-type"
+          );
+
+        tabs.forEach(otherTab => {
+          otherTab.classList.remove(
+            "active"
+          );
+        });
+
+        tab.classList.add(
+          "active"
+        );
+
+        searchNearbyFacilities(
+          campsite,
+          service,
+          facilityType
+        );
+      }
+    );
+  });
 }
 
 function setupCampsiteImageButton(
@@ -1240,69 +1463,62 @@ function closeWeatherPanel() {
   resizeMap();
 }
 
-function setupOnsenClickEvents(
-  onsens,
+function setupFacilityClickEvents(
+  facilities,
   service,
-  campsite
+  campsite,
+  facilityType
 ) {
-
-  const onsenItems =
+  const facilityItems =
     document.querySelectorAll(
-      ".onsen-item"
+      ".facility-item"
     );
 
-  onsenItems.forEach(item => {
-
+  facilityItems.forEach(item => {
     item.addEventListener(
       "click",
       () => {
-
         const placeId =
           item.getAttribute(
             "data-place-id"
           );
 
-        const selectedOnsen =
-          onsens.find(
-            onsen =>
-              onsen.place_id ===
-              placeId
+        const selectedFacility =
+          facilities.find(
+            facility =>
+              facility.place_id === placeId
           );
 
-        if (!selectedOnsen) {
+        if (!selectedFacility) {
           return;
         }
-
 
         service.getDetails(
           {
             placeId:
-              selectedOnsen.place_id,
+              selectedFacility.place_id,
 
             fields: [
               "name",
               "formatted_address",
               "opening_hours",
               "website",
-              "photos",
               "geometry"
             ]
           },
 
           async (place, status) => {
-
             if (
               status !==
-              google.maps.places.PlacesServiceStatus.OK
+                google.maps.places.PlacesServiceStatus.OK ||
+              !place
             ) {
-
               console.error(
-                "温泉の詳細情報が取得できませんでした"
+                "施設の詳細情報が取得できませんでした"
               );
 
               return;
             }
-
 
             const searchContainer =
               document.querySelector(
@@ -1319,7 +1535,6 @@ function setupOnsenClickEvents(
                 "onsen-content"
               );
 
-
             if (
               !onsenPanel ||
               !onsenContent
@@ -1330,14 +1545,11 @@ function setupOnsenClickEvents(
             closeCampsiteImagePanel();
             closeWeatherPanel();
 
-
             onsenPanel.classList.remove(
               "hidden"
             );
 
-
             if (searchContainer) {
-
               searchContainer.classList.add(
                 "onsen-open"
               );
@@ -1347,57 +1559,42 @@ function setupOnsenClickEvents(
               );
             }
 
-
             const closeOnsenButton =
               document.getElementById(
                 "close-onsen-panel"
               );
 
-
             if (closeOnsenButton) {
-
               closeOnsenButton.classList.remove(
                 "hidden"
               );
             }
 
-
-            setTimeout(() => {
-
-              if (!map) {
-                return;
-              }
-
-              const center =
-                map.getCenter();
-
-              google.maps.event.trigger(
-                map,
-                "resize"
-              );
-
-              map.setCenter(center);
-
-            }, 0);
+            resizeMap();
 
             let routeInfo = null;
 
             try {
-              routeInfo = await fetchRouteInfo(
-                campsite,
-                place
-              );
+              routeInfo =
+                await fetchRouteInfo(
+                  campsite,
+                  place
+                );
             } catch (error) {
-            console.error(
+              console.error(
                 "ルート情報の取得に失敗しました:",
                 error
               );
             }
 
-            onsenContent.innerHTML = `
+            const title =
+              facilityType === "onsen"
+                ? "温泉施設情報"
+                : "商業施設情報";
 
+            onsenContent.innerHTML = `
               <h2>
-                温泉施設情報
+                ${title}
               </h2>
 
               <div class="detail-box">
@@ -1430,7 +1627,9 @@ function setupOnsenClickEvents(
                 </p>
 
                 <p>
-                  <strong>キャンプ場からの距離</strong>
+                  <strong>
+                    キャンプ場からの距離
+                  </strong>
                 </p>
 
                 <p>
@@ -1444,7 +1643,9 @@ function setupOnsenClickEvents(
                 </p>
 
                 <p>
-                  <strong>車での所要時間</strong>
+                  <strong>
+                    車での所要時間
+                  </strong>
                 </p>
 
                 <p>
@@ -1458,7 +1659,9 @@ function setupOnsenClickEvents(
                 </p>
 
                 <p>
-                  <strong>公式サイト</strong>
+                  <strong>
+                    公式サイト
+                  </strong>
                 </p>
 
                 <p>
@@ -1470,7 +1673,6 @@ function setupOnsenClickEvents(
                 </p>
 
               </div>
-
             `;
           }
         );
