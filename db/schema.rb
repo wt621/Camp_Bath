@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_16_211438) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_16_054721) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -23,6 +23,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_16_211438) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_campsites_on_user_id"
+  end
+
+  create_table "favorites", force: :cascade do |t|
+    t.string "campsite_place_id", null: false
+    t.string "onsen_place_id", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "campsite_place_id", "onsen_place_id"], name: "idx_on_user_id_campsite_place_id_onsen_place_id_fc6c7071bf", unique: true
+    t.index ["user_id"], name: "index_favorites_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -39,4 +47,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_16_211438) do
   end
 
   add_foreign_key "campsites", "users"
+  add_foreign_key "favorites", "users"
 end
