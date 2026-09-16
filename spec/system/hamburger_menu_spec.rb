@@ -24,6 +24,7 @@ RSpec.describe 'ハンバーガーメニュー', type: :system do
 
       expect(page).to have_css('#hamburger-menu', visible: true, wait: 10)
       expect(page).to have_link('ユーザー設定')
+      expect(page).to have_link('お気に入り')
       expect(page).to have_link('ログアウト')
     end
   end
