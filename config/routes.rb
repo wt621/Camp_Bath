@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   get "profile", to: "users#profile"
-
+  get "favorites", to: "favorites#index"
   get "search/regions", to: "search#regions", as: :search_regions
   get "search/prefectures", to: "search#prefectures", as: :search_prefectures
 

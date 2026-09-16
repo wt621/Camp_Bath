@@ -13,7 +13,6 @@ services:
       - db
       - chrome
     environment:
-      DATABASE_URL: ${DATABASE_URL}
       SELENIUM_DRIVER_URL: ${SELENIUM_DRIVER_URL}
       SENTRY_DSN: ${SENTRY_DSN}
   db:
