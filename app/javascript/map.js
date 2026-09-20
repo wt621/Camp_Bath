@@ -1503,7 +1503,8 @@ function setupFacilityClickEvents(
               "formatted_address",
               "opening_hours",
               "website",
-              "geometry"
+              "geometry",
+              "place_id"
             ]
           },
 
@@ -1672,8 +1673,28 @@ function setupFacilityClickEvents(
                   }
                 </p>
 
+                ${
+                  facilityType === "onsen"
+                    ? `
+                      <button
+                        id="favorite-toggle-button"
+                        type="button"
+                      >
+                        キャンプ場・温泉情報を保存
+                      </button>
+                    `
+                    : ""
+                }
+
               </div>
             `;
+
+            if (facilityType === "onsen") {
+              setupFavoriteButton(
+                campsite.place_id,
+                place.place_id
+              );
+            }
           }
         );
       }
@@ -2455,3 +2476,126 @@ function formatRouteDistance(distanceMeters) {
   return `約${(distanceMeters / 1000).toFixed(1)} km`;
 }
 
+function setupFavoriteButton(
+  campsitePlaceId,
+  onsenPlaceId
+) {
+  const button =
+    document.getElementById(
+      "favorite-toggle-button"
+    );
+
+  if (!button) {
+    return;
+  }
+
+  const csrfToken =
+    document
+      .querySelector('meta[name="csrf-token"]')
+      ?.getAttribute("content");
+
+  if (!csrfToken) {
+    console.error(
+      "CSRFトークンが取得できませんでした"
+    );
+
+    return;
+  }
+
+  const updateButton = saved => {
+    button.textContent = saved
+      ? "キャンプ場・温泉情報を削除"
+      : "キャンプ場・温泉情報を保存";
+  };
+
+  const checkFavorite = async () => {
+    try {
+      const params =
+        new URLSearchParams({
+          campsite_place_id:
+            campsitePlaceId,
+          onsen_place_id:
+            onsenPlaceId
+        });
+
+      const response = await fetch(
+        `/favorites/check?${params.toString()}`,
+        {
+          headers: {
+            Accept:
+              "application/json"
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `お気に入り状態の取得に失敗しました: ${response.status}`
+        );
+      }
+
+      const data =
+        await response.json();
+
+      updateButton(data.saved);
+    } catch (error) {
+      console.error(
+        "お気に入り状態の取得に失敗しました:",
+        error
+      );
+    }
+  };
+
+  button.addEventListener(
+    "click",
+    async () => {
+      button.disabled = true;
+
+      try {
+        const response = await fetch(
+          "/favorites",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+              "Accept":
+                "application/json",
+              "X-CSRF-Token": csrfToken
+            },
+            body: JSON.stringify({
+              campsite_place_id:
+                campsitePlaceId,
+              onsen_place_id:
+                onsenPlaceId
+            })
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `お気に入り処理に失敗しました: ${response.status}`
+          );
+        }
+
+        const data =
+          await response.json();
+
+        updateButton(data.saved);
+      } catch (error) {
+        console.error(
+          "お気に入り処理に失敗しました:",
+          error
+        );
+
+        alert(
+          "お気に入りの処理に失敗しました。"
+        );
+      } finally {
+        button.disabled = false;
+      }
+    }
+  );
+
+  checkFavorite();
+}
