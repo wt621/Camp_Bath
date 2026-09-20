@@ -17,15 +17,10 @@ RSpec.describe 'お気に入りページ', type: :system do
       expect(page).to have_content('温泉施設')
     end
 
-    it 'お気に入りが登録されていない場合のメッセージが表示されること' do
+    it 'お気に入りが登録されていない場合でもセット表示の見出しが表示されること' do
       visit favorites_path
 
-      expect(page).to have_content(
-        'お気に入り登録したキャンプ場はありません。'
-      )
-      expect(page).to have_content(
-        'お気に入り登録した温泉施設はありません。'
-      )
+      expect(page).to have_content('キャンプ場・温泉施設')
     end
   end
 

@@ -1725,6 +1725,550 @@ function resizeMap() {
   }, 0);
 }
 
+function renderFavoriteCampsitePanel(
+  campsite
+) {
+  const searchContainer =
+    document.querySelector(
+      ".search-container"
+    );
+
+  const panel =
+    document.getElementById(
+      "campsite-panel"
+    );
+
+  const panelContent =
+    document.getElementById(
+      "campsite-content"
+    );
+
+  const closeButton =
+    document.getElementById(
+      "close-campsite-panel"
+    );
+
+  if (
+    !searchContainer ||
+    !panel ||
+    !panelContent
+  ) {
+    console.error(
+      "お気に入りのキャンプ場パネルが見つかりません"
+    );
+
+    return;
+  }
+
+  panel.classList.remove(
+    "hidden"
+  );
+
+  searchContainer.classList.add(
+    "campsite-open"
+  );
+
+  if (closeButton) {
+    closeButton.classList.remove(
+      "hidden"
+    );
+  }
+
+  panelContent.innerHTML = `
+    <h2>
+      キャンプ場情報
+    </h2>
+
+    <div class="detail-box">
+
+      <h3>
+        ${campsite.name}
+      </h3>
+
+      <p>
+        <strong>住所</strong>
+      </p>
+
+      <p>
+        ${
+          campsite.formatted_address ||
+          "情報なし"
+        }
+      </p>
+
+      <p>
+        <strong>営業時間</strong>
+      </p>
+
+      <p>
+        ${
+          campsite.opening_hours
+            ? campsite.opening_hours.weekday_text.join("<br>")
+            : "情報なし"
+        }
+      </p>
+
+      <p>
+        <strong>公式サイト</strong>
+      </p>
+
+      <p>
+        ${
+          campsite.website
+            ? `<a href="${campsite.website}" target="_blank">ウェブサイトを見る</a>`
+            : "情報なし"
+        }
+      </p>
+
+      <button
+        id="campsite-image-open-button"
+        type="button"
+        class="campsite-image-button"
+      >
+        キャンプ場の画像を見る
+      </button>
+
+      <button
+        id="weather-open-button"
+        type="button"
+        class="campsite-image-button"
+      >
+        キャンプ場の天気を見る
+      </button>
+
+    </div>
+  `;
+
+  setupCampsiteImageButton(
+    campsite
+  );
+
+  setupWeatherButton(
+    campsite
+  );
+}
+
+
+async function renderFavoriteOnsenPanel(
+  campsite,
+  onsen
+) {
+  const searchContainer =
+    document.querySelector(
+      ".search-container"
+    );
+
+  const panel =
+    document.getElementById(
+      "onsen-panel"
+    );
+
+  const content =
+    document.getElementById(
+      "onsen-content"
+    );
+
+  const closeButton =
+    document.getElementById(
+      "close-onsen-panel"
+    );
+
+  if (
+    !searchContainer ||
+    !panel ||
+    !content
+  ) {
+    console.error(
+      "お気に入りの温泉パネルが見つかりません"
+    );
+
+    return;
+  }
+
+  panel.classList.remove(
+    "hidden"
+  );
+
+  searchContainer.classList.add(
+    "onsen-open"
+  );
+
+  if (closeButton) {
+    closeButton.classList.remove(
+      "hidden"
+    );
+  }
+
+  content.innerHTML = `
+    <h2>
+      温泉施設情報
+    </h2>
+
+    <div class="detail-box">
+      <h3>
+        ${onsen.name}
+      </h3>
+
+      <p>
+        <strong>住所</strong>
+      </p>
+
+      <p>
+        ${
+          onsen.formatted_address ||
+          "情報なし"
+        }
+      </p>
+
+      <p>
+        <strong>営業時間</strong>
+      </p>
+
+      <p>
+        ${
+          onsen.opening_hours
+            ? onsen.opening_hours.weekday_text.join("<br>")
+            : "情報なし"
+        }
+      </p>
+
+      <p>
+        <strong>
+          キャンプ場からの距離
+        </strong>
+      </p>
+
+      <p id="favorite-route-distance">
+        取得中です...
+      </p>
+
+      <p>
+        <strong>
+          車での所要時間
+        </strong>
+      </p>
+
+      <p id="favorite-route-duration">
+        取得中です...
+      </p>
+
+      <p>
+        <strong>
+          公式サイト
+        </strong>
+      </p>
+
+      <p>
+        ${
+          onsen.website
+            ? `<a href="${onsen.website}" target="_blank">ウェブサイトを見る</a>`
+            : "情報なし"
+        }
+      </p>
+
+      <button
+        id="favorite-toggle-button"
+        type="button"
+      >
+        キャンプ場・温泉情報を保存
+      </button>
+
+    </div>
+  `;
+
+  setupFavoriteButton(
+    campsite.place_id,
+    onsen.place_id
+  );
+
+  try {
+    const routeInfo =
+      await fetchRouteInfo(
+        campsite,
+        onsen
+      );
+
+    const distanceElement =
+      document.getElementById(
+        "favorite-route-distance"
+      );
+
+    const durationElement =
+      document.getElementById(
+        "favorite-route-duration"
+      );
+
+    if (distanceElement) {
+      distanceElement.textContent =
+        formatRouteDistance(
+          routeInfo.distance_meters
+        );
+    }
+
+    if (durationElement) {
+      durationElement.textContent =
+        formatRouteDuration(
+          routeInfo.duration
+        );
+    }
+  } catch (error) {
+    console.error(
+      "お気に入りの温泉施設のルート情報取得に失敗しました:",
+      error
+    );
+
+    const distanceElement =
+      document.getElementById(
+        "favorite-route-distance"
+      );
+
+    const durationElement =
+      document.getElementById(
+        "favorite-route-duration"
+      );
+
+    if (distanceElement) {
+      distanceElement.textContent =
+        "取得できませんでした";
+    }
+
+    if (durationElement) {
+      durationElement.textContent =
+        "取得できませんでした";
+    }
+  }
+}
+
+
+function openFavoriteOnsenDetails(
+  onsen,
+  campsite
+) {
+  renderFavoriteOnsenPanel(
+    campsite,
+    onsen
+  );
+}
+
+
+function showFavoritePanels(
+  campsite,
+  onsen
+) {
+  if (!campsite || !onsen) {
+    console.error(
+      "お気に入りの施設情報が揃っていません"
+    );
+
+    return;
+  }
+
+  renderFavoriteCampsitePanel(
+    campsite
+  );
+
+  renderFavoriteOnsenPanel(
+    campsite,
+    onsen
+  );
+
+  resizeMap();
+}
+
+
+function showFavoritePlaces(
+  campsitePlaceId,
+  onsenPlaceId
+) {
+  if (!map) {
+    console.error(
+      "Google Mapsがまだ初期化されていません"
+    );
+
+    return;
+  }
+
+  clearCampsiteMarkers();
+
+  const service =
+    new google.maps.places.PlacesService(
+      map
+    );
+
+  const bounds =
+    new google.maps.LatLngBounds();
+
+  let campsitePlace = null;
+  let onsenPlace = null;
+
+  let completedCount = 0;
+
+  const handleCompleted = () => {
+    completedCount += 1;
+
+    if (completedCount !== 2) {
+      return;
+    }
+
+    if (!campsitePlace || !onsenPlace) {
+      console.error(
+        "お気に入りの施設情報を取得できませんでした"
+      );
+
+      return;
+    }
+
+    if (!bounds.isEmpty()) {
+      map.fitBounds(bounds);
+    }
+
+    showFavoritePanels(
+      campsitePlace,
+      onsenPlace
+    );
+  };
+
+  service.getDetails(
+    {
+      placeId:
+        campsitePlaceId,
+
+      fields: [
+        "name",
+        "formatted_address",
+        "opening_hours",
+        "website",
+        "geometry",
+        "place_id"
+      ]
+    },
+
+    (place, status) => {
+      if (
+        status !==
+          google.maps.places.PlacesServiceStatus.OK ||
+        !place ||
+        !place.geometry ||
+        !place.geometry.location
+      ) {
+        console.error(
+          "お気に入りのキャンプ場情報を取得できませんでした:",
+          status
+        );
+
+        handleCompleted();
+
+        return;
+      }
+
+      campsitePlace =
+        place;
+
+      const marker =
+        new google.maps.Marker({
+          position:
+            place.geometry.location,
+
+          map:
+            map,
+
+          title:
+            place.name
+        });
+
+      campsiteMarkers.push(
+        marker
+      );
+
+      marker.addListener(
+        "click",
+        () => {
+          openCampsiteDetails(
+            place,
+            service
+          );
+        }
+      );
+
+      bounds.extend(
+        place.geometry.location
+      );
+
+      handleCompleted();
+    }
+  );
+
+  service.getDetails(
+    {
+      placeId:
+        onsenPlaceId,
+
+      fields: [
+        "name",
+        "formatted_address",
+        "opening_hours",
+        "website",
+        "geometry",
+        "place_id"
+      ]
+    },
+
+    (place, status) => {
+      if (
+        status !==
+          google.maps.places.PlacesServiceStatus.OK ||
+        !place ||
+        !place.geometry ||
+        !place.geometry.location
+      ) {
+        console.error(
+          "お気に入りの温泉施設情報を取得できませんでした:",
+          status
+        );
+
+        handleCompleted();
+
+        return;
+      }
+
+      onsenPlace =
+        place;
+
+      const marker =
+        new google.maps.Marker({
+          position:
+            place.geometry.location,
+
+          map:
+            map,
+
+          title:
+            place.name
+        });
+
+      campsiteMarkers.push(
+        marker
+      );
+
+      marker.addListener(
+        "click",
+        () => {
+          openFavoriteOnsenDetails(
+            place,
+            campsitePlace
+          );
+        }
+      );
+
+      bounds.extend(
+        place.geometry.location
+      );
+
+      handleCompleted();
+    }
+  );
+}
+
 function initMap() {
 
   const center =
@@ -1733,26 +2277,22 @@ function initMap() {
       lng: 139.767125
     };
 
-
   const mapElement =
     document.getElementById(
       "map"
     );
-
 
   if (
     !mapElement ||
     typeof google === "undefined" ||
     !google.maps
   ) {
-
     console.error(
       "map element not found or Google Maps API not loaded"
     );
 
     return;
   }
-
 
   map =
     new google.maps.Map(
@@ -1763,6 +2303,32 @@ function initMap() {
       }
     );
 
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const campsitePlaceId =
+    params.get(
+      "campsite_place_id"
+    );
+
+  const onsenPlaceId =
+    params.get(
+      "onsen_place_id"
+    );
+
+  if (
+    campsitePlaceId &&
+    onsenPlaceId
+  ) {
+    showFavoritePlaces(
+      campsitePlaceId,
+      onsenPlaceId
+    );
+
+    return;
+  }
 
   searchCampsites(
     center
