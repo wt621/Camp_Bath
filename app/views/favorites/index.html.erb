@@ -4,24 +4,28 @@
   <section class="favorites-section">
     <h2>キャンプ場・温泉施設</h2>
 
-<% @favorites.each do |favorite| %>
-  <%= link_to search_path(
-    campsite_place_id: favorite.campsite_place_id,
-    onsen_place_id: favorite.onsen_place_id
-  ) do %>
-    <div class="detail-box">
-      <div>
-        <h3>キャンプ場</h3>
-        <p><%= favorite.campsite_place_id %></p>
-      </div>
+    <% @favorites.each do |favorite| %>
+      <%= link_to search_path(
+        campsite_place_id: favorite.campsite_place_id,
+        onsen_place_id: favorite.onsen_place_id
+      ),
+      data: {
+        favorite_item: true,
+        campsite_place_id: favorite.campsite_place_id,
+        onsen_place_id: favorite.onsen_place_id
+      } do %>
+        <div class="detail-box">
+          <div>
+            <h3>キャンプ場</h3>
+            <p data-campsite-name>施設名を取得中...</p>
+          </div>
 
-      <div>
-        <h3>温泉施設</h3>
-        <p><%= favorite.onsen_place_id %></p>
-      </div>
-    </div>
-  <% end %>
-<% end %>
-
+          <div>
+            <h3>温泉施設</h3>
+            <p data-onsen-name>施設名を取得中...</p>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
   </section>
 </div>
