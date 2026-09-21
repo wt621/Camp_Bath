@@ -3,6 +3,7 @@ import "@hotwired/turbo-rails"
 import "controllers"
 import "map"
 import "flash"
+import "favorites"
 
 document.addEventListener('turbo:load', function() {
   const button = document.getElementById('hamburger-button');
