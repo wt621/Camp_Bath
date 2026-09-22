@@ -32,4 +32,12 @@ RSpec.describe Favorite, type: :model do
       expect(favorite).to be_invalid
     end
   end
+
+  describe 'アソシエーション' do
+    it 'ユーザーに紐づいていること' do
+      favorite = build(:favorite)
+
+      expect(favorite.user).to be_present
+    end
+  end
 end
