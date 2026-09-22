@@ -1,0 +1,13 @@
+{
+  "name": "Camp-Bath",
+  "short_name": "Camp-Bath",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "1080x1071",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone"
+}
