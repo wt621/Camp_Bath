@@ -1,5 +1,9 @@
 <header class="app-header">
-  <%= link_to "Camp-Bath", root_path %>
+  <%= link_to root_path do %>
+    <%= image_tag "header_logo.png",
+          alt: "Camp-Bath",
+          class: "header-logo" %>
+  <% end %>
 
   <% if user_signed_in? %>
     <nav class="header-nav">
