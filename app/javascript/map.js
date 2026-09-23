@@ -1,5 +1,20 @@
 const FACILITY_SEARCH_RADIUS = 10000;
 const FACILITY_RESULT_COUNT = 3;
+const MARKER_ICON_SIZE = 32;
+
+function getMarkerIcon(iconName) {
+  return {
+    url: `/assets/${iconName}`,
+    scaledSize: new google.maps.Size(
+      MARKER_ICON_SIZE,
+      MARKER_ICON_SIZE
+    ),
+    anchor: new google.maps.Point(
+      MARKER_ICON_SIZE / 2,
+      MARKER_ICON_SIZE
+    )
+  };
+}
 
 let map;
 let currentLocationMarker;
@@ -51,7 +66,8 @@ function showSelectedCampsiteMarker(campsite) {
   const marker = new google.maps.Marker({
     position: campsite.geometry.location,
     map: map,
-    title: campsite.name
+    title: campsite.name,
+    icon: getMarkerIcon("Camp-icon.png")
   });
 
   marker.addListener("click", () => {
@@ -109,7 +125,8 @@ function showCampsiteSearchMarkers() {
     const marker = new google.maps.Marker({
       position: campsite.geometry.location,
       map: map,
-      title: campsite.name
+      title: campsite.name,
+      icon: getMarkerIcon("Camp-icon.png")
     });
 
     const service =
@@ -147,7 +164,12 @@ function showFacilityMarkers(
     const marker = new google.maps.Marker({
       position: facility.geometry.location,
       map: map,
-      title: facility.name
+      title: facility.name,
+      icon: getMarkerIcon(
+        facilityType === "onsen"
+          ? "Onsen-icon.png"
+          : "Shop-icon.png"
+      )
     });
 
     marker.addListener("click", () => {
@@ -222,7 +244,8 @@ function searchCampsites(center) {
         const marker = new google.maps.Marker({
           position: campsite.geometry.location,
           map: map,
-          title: campsite.name
+          title: campsite.name,
+          icon: getMarkerIcon("Camp-icon.png")
         });
 
         campsiteMarkers.push(marker);
@@ -1669,7 +1692,12 @@ function openFacilityDetails(
         new google.maps.Marker({
           position: place.geometry.location,
           map: map,
-          title: place.name
+          title: place.name,
+          icon: getMarkerIcon(
+            facilityType === "onsen"
+              ? "Onsen-icon.png"
+              : "Shop-icon.png"
+          )
         });
 
       facilityMarker.addListener(
@@ -2378,7 +2406,10 @@ function showFavoritePlaces(
             map,
 
           title:
-            place.name
+            place.name,
+
+          icon:
+            getMarkerIcon("Camp-icon.png")
         });
 
       campsiteMarkers.push(
@@ -2448,7 +2479,10 @@ function showFavoritePlaces(
             map,
 
           title:
-            place.name
+            place.name,
+
+          icon:
+            getMarkerIcon("Onsen-icon.png")
         });
 
       campsiteMarkers.push(
