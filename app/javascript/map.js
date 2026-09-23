@@ -3,7 +3,16 @@ const FACILITY_RESULT_COUNT = 3;
 
 let map;
 let currentLocationMarker;
+
 let campsiteMarkers = [];
+let facilityMarkers = [];
+
+let selectedCampsiteMarker = null;
+let selectedCampsite = null;
+
+let campsiteSearchResults = [];
+let currentFacilityResults = [];
+let currentFacilityType = null;
 
 function isCampsite(place) {
   const name = place.name || "";
@@ -28,6 +37,135 @@ function clearCampsiteMarkers() {
   campsiteMarkers = [];
 }
 
+function clearFacilityMarkers() {
+  facilityMarkers.forEach(marker => {
+    marker.setMap(null);
+  });
+
+  facilityMarkers = [];
+}
+
+function showSelectedCampsiteMarker(campsite) {
+  clearCampsiteMarkers();
+
+  const marker = new google.maps.Marker({
+    position: campsite.geometry.location,
+    map: map,
+    title: campsite.name
+  });
+
+  marker.addListener("click", () => {
+    const service =
+      new google.maps.places.PlacesService(map);
+
+    openCampsiteDetails(
+      campsite,
+      service
+    );
+  });
+
+  campsiteMarkers.push(marker);
+  selectedCampsiteMarker = marker;
+}
+
+function restoreSelectedCampsiteAndFacilities() {
+  if (
+    !selectedCampsite ||
+    !selectedCampsite.geometry ||
+    !selectedCampsite.geometry.location
+  ) {
+    showCampsiteSearchMarkers();
+    return;
+  }
+
+  showSelectedCampsiteMarker(
+    selectedCampsite
+  );
+
+  if (
+    currentFacilityResults.length > 0 &&
+    currentFacilityType
+  ) {
+    showFacilityMarkers(
+      currentFacilityResults,
+      selectedCampsite,
+      currentFacilityType
+    );
+  }
+}
+
+function showCampsiteSearchMarkers() {
+  clearCampsiteMarkers();
+  clearFacilityMarkers();
+
+  campsiteSearchResults.forEach(campsite => {
+    if (
+      !campsite.geometry ||
+      !campsite.geometry.location
+    ) {
+      return;
+    }
+
+    const marker = new google.maps.Marker({
+      position: campsite.geometry.location,
+      map: map,
+      title: campsite.name
+    });
+
+    const service =
+      new google.maps.places.PlacesService(map);
+
+    marker.addListener("click", () => {
+      openCampsiteDetails(
+        campsite,
+        service
+      );
+    });
+
+    campsiteMarkers.push(marker);
+  });
+
+  selectedCampsiteMarker = null;
+  selectedCampsite = null;
+}
+
+function showFacilityMarkers(
+  facilities,
+  campsite,
+  facilityType
+) {
+  clearFacilityMarkers();
+
+  facilities.forEach(facility => {
+    if (
+      !facility.geometry ||
+      !facility.geometry.location
+    ) {
+      return;
+    }
+
+    const marker = new google.maps.Marker({
+      position: facility.geometry.location,
+      map: map,
+      title: facility.name
+    });
+
+    marker.addListener("click", () => {
+      const service =
+        new google.maps.places.PlacesService(map);
+
+      openFacilityDetails(
+        facility,
+        service,
+        campsite,
+        facilityType
+      );
+    });
+
+    facilityMarkers.push(marker);
+  });
+}
+
 function searchCampsites(center) {
   if (!map) {
     console.error("Google Mapsがまだ初期化されていません");
@@ -44,8 +182,12 @@ function searchCampsites(center) {
     return;
   }
 
-  clearCampsiteMarkers();
+  clearFacilityMarkers();
 
+  selectedCampsite = null;
+  selectedCampsiteMarker = null;
+  currentFacilityResults = [];
+  currentFacilityType = null;
 
   service.nearbySearch(
     {
@@ -69,19 +211,14 @@ function searchCampsites(center) {
         return;
       }
 
-      results.forEach(campsite => {
+      campsiteSearchResults = results.filter(
+        campsite =>
+          isCampsite(campsite) &&
+          campsite.geometry &&
+          campsite.geometry.location
+      );
 
-        if (!isCampsite(campsite)) {
-          return;
-        }
-
-        if (
-          !campsite.geometry ||
-          !campsite.geometry.location
-        ) {
-          return;
-        }
-
+      campsiteSearchResults.forEach(campsite => {
         const marker = new google.maps.Marker({
           position: campsite.geometry.location,
           map: map,
@@ -92,7 +229,7 @@ function searchCampsites(center) {
 
         marker.addListener("click", () => {
           openCampsiteDetails(
-            campsite,
+          campsite,
             service
           );
         });
@@ -119,6 +256,8 @@ function openCampsiteDetails(
   if (!panel || !panelContent) {
     return;
   }
+
+  selectedCampsite = campsite;
 
   const searchContainer =
     document.querySelector(
@@ -205,6 +344,8 @@ function openCampsiteDetails(
         return;
       }
 
+      showSelectedCampsiteMarker(place);
+
       searchNearbyFacilities(
         place,
         service,
@@ -227,6 +368,8 @@ function searchNearbyFacilities(
   if (!panelContent) {
     return;
   }
+
+  currentFacilityType = facilityType;
 
   const renderFacilityList = (
     facilities,
@@ -462,6 +605,9 @@ function searchNearbyFacilities(
               );
         }
 
+        currentFacilityResults =
+          topFacilities;
+
         const listHTML =
           renderFacilityList(
             topFacilities,
@@ -470,6 +616,12 @@ function searchNearbyFacilities(
 
         renderCampsiteContent(
           listHTML,
+          "onsen"
+        );
+
+        showFacilityMarkers(
+          topFacilities,
+          campsite,
           "onsen"
         );
 
@@ -593,6 +745,12 @@ function searchCommercialFacilities(
 
       renderCampsiteContent(
         listHTML,
+        "commercial"
+      );
+
+      showFacilityMarkers(
+        facilitiesWithDistance,
+        campsite,
         "commercial"
       );
 
@@ -1463,6 +1621,251 @@ function closeWeatherPanel() {
   resizeMap();
 }
 
+function openFacilityDetails(
+  facility,
+  service,
+  campsite,
+  facilityType
+) {
+  clearFacilityMarkers();
+  if (selectedCampsiteMarker) {
+    selectedCampsiteMarker.setMap(map);
+  }
+
+  service.getDetails(
+    {
+      placeId: facility.place_id,
+
+      fields: [
+        "name",
+        "formatted_address",
+        "opening_hours",
+        "website",
+        "geometry",
+        "place_id"
+      ]
+    },
+
+    async (place, status) => {
+      if (
+        status !==
+          google.maps.places.PlacesServiceStatus.OK ||
+        !place
+      ) {
+        console.error(
+          "施設の詳細情報が取得できませんでした"
+        );
+
+        return;
+      }
+
+      clearFacilityMarkers();
+
+      if (selectedCampsiteMarker) {
+        selectedCampsiteMarker.setMap(map);
+      }
+
+      const facilityMarker =
+        new google.maps.Marker({
+          position: place.geometry.location,
+          map: map,
+          title: place.name
+        });
+
+      facilityMarker.addListener(
+        "click",
+        () => {
+          openFacilityDetails(
+            place,
+            service,
+            campsite,
+            facilityType
+          );
+        }
+      );
+
+      facilityMarkers.push(
+        facilityMarker
+      );
+
+      const searchContainer =
+        document.querySelector(
+          ".search-container"
+        );
+
+      const onsenPanel =
+        document.getElementById(
+          "onsen-panel"
+        );
+
+      const onsenContent =
+        document.getElementById(
+          "onsen-content"
+        );
+
+      if (
+        !onsenPanel ||
+        !onsenContent
+      ) {
+        return;
+      }
+
+      closeCampsiteImagePanel();
+      closeWeatherPanel();
+
+      onsenPanel.classList.remove(
+        "hidden"
+      );
+
+      if (searchContainer) {
+        searchContainer.classList.add(
+          "onsen-open"
+        );
+
+        searchContainer.classList.remove(
+          "campsite-image-open"
+        );
+      }
+
+      const closeOnsenButton =
+        document.getElementById(
+          "close-onsen-panel"
+        );
+
+      if (closeOnsenButton) {
+        closeOnsenButton.classList.remove(
+          "hidden"
+        );
+      }
+
+      resizeMap();
+
+      let routeInfo = null;
+
+      try {
+        routeInfo =
+          await fetchRouteInfo(
+            campsite,
+            place
+          );
+      } catch (error) {
+        console.error(
+          "ルート情報の取得に失敗しました:",
+          error
+        );
+      }
+
+      const title =
+        facilityType === "onsen"
+          ? "温泉施設情報"
+          : "商業施設情報";
+
+      onsenContent.innerHTML = `
+        <h2>
+          ${title}
+        </h2>
+
+        <div class="detail-box">
+
+          <h3>
+            ${place.name}
+          </h3>
+
+          <p>
+            <strong>住所</strong>
+          </p>
+
+          <p>
+            ${
+              place.formatted_address ||
+              "情報なし"
+            }
+          </p>
+
+          <p>
+            <strong>営業時間</strong>
+          </p>
+
+          <p>
+            ${
+              place.opening_hours
+                ? place.opening_hours.weekday_text.join("<br>")
+                : "情報なし"
+            }
+          </p>
+
+          <p>
+            <strong>
+              キャンプ場からの距離
+            </strong>
+          </p>
+
+          <p>
+            ${
+              routeInfo
+                ? formatRouteDistance(
+                    routeInfo.distance_meters
+                  )
+                : "取得できませんでした"
+            }
+          </p>
+
+          <p>
+            <strong>
+              車での所要時間
+            </strong>
+          </p>
+
+          <p>
+            ${
+              routeInfo
+                ? formatRouteDuration(
+                    routeInfo.duration
+                  )
+                : "取得できませんでした"
+            }
+          </p>
+
+          <p>
+            <strong>
+              公式サイト
+            </strong>
+          </p>
+
+          <p>
+            ${
+              place.website
+                ? `<a href="${place.website}" target="_blank">ウェブサイトを見る</a>`
+                : "情報なし"
+            }
+          </p>
+
+          ${
+            facilityType === "onsen"
+              ? `
+                <button
+                  id="favorite-toggle-button"
+                  type="button"
+                >
+                  キャンプ場・温泉情報を保存
+                </button>
+              `
+              : ""
+          }
+
+        </div>
+      `;
+
+      if (facilityType === "onsen") {
+        setupFavoriteButton(
+          campsite.place_id,
+          place.place_id
+        );
+      }
+    }
+  );
+}
+
 function setupFacilityClickEvents(
   facilities,
   service,
@@ -1493,209 +1896,11 @@ function setupFacilityClickEvents(
           return;
         }
 
-        service.getDetails(
-          {
-            placeId:
-              selectedFacility.place_id,
-
-            fields: [
-              "name",
-              "formatted_address",
-              "opening_hours",
-              "website",
-              "geometry",
-              "place_id"
-            ]
-          },
-
-          async (place, status) => {
-            if (
-              status !==
-                google.maps.places.PlacesServiceStatus.OK ||
-              !place
-            ) {
-              console.error(
-                "施設の詳細情報が取得できませんでした"
-              );
-
-              return;
-            }
-
-            const searchContainer =
-              document.querySelector(
-                ".search-container"
-              );
-
-            const onsenPanel =
-              document.getElementById(
-                "onsen-panel"
-              );
-
-            const onsenContent =
-              document.getElementById(
-                "onsen-content"
-              );
-
-            if (
-              !onsenPanel ||
-              !onsenContent
-            ) {
-              return;
-            }
-
-            closeCampsiteImagePanel();
-            closeWeatherPanel();
-
-            onsenPanel.classList.remove(
-              "hidden"
-            );
-
-            if (searchContainer) {
-              searchContainer.classList.add(
-                "onsen-open"
-              );
-
-              searchContainer.classList.remove(
-                "campsite-image-open"
-              );
-            }
-
-            const closeOnsenButton =
-              document.getElementById(
-                "close-onsen-panel"
-              );
-
-            if (closeOnsenButton) {
-              closeOnsenButton.classList.remove(
-                "hidden"
-              );
-            }
-
-            resizeMap();
-
-            let routeInfo = null;
-
-            try {
-              routeInfo =
-                await fetchRouteInfo(
-                  campsite,
-                  place
-                );
-            } catch (error) {
-              console.error(
-                "ルート情報の取得に失敗しました:",
-                error
-              );
-            }
-
-            const title =
-              facilityType === "onsen"
-                ? "温泉施設情報"
-                : "商業施設情報";
-
-            onsenContent.innerHTML = `
-              <h2>
-                ${title}
-              </h2>
-
-              <div class="detail-box">
-
-                <h3>
-                  ${place.name}
-                </h3>
-
-                <p>
-                  <strong>住所</strong>
-                </p>
-
-                <p>
-                  ${
-                    place.formatted_address ||
-                    "情報なし"
-                  }
-                </p>
-
-                <p>
-                  <strong>営業時間</strong>
-                </p>
-
-                <p>
-                  ${
-                    place.opening_hours
-                      ? place.opening_hours.weekday_text.join("<br>")
-                      : "情報なし"
-                  }
-                </p>
-
-                <p>
-                  <strong>
-                    キャンプ場からの距離
-                  </strong>
-                </p>
-
-                <p>
-                  ${
-                    routeInfo
-                      ? formatRouteDistance(
-                          routeInfo.distance_meters
-                        )
-                      : "取得できませんでした"
-                  }
-                </p>
-
-                <p>
-                  <strong>
-                    車での所要時間
-                  </strong>
-                </p>
-
-                <p>
-                  ${
-                    routeInfo
-                      ? formatRouteDuration(
-                          routeInfo.duration
-                        )
-                      : "取得できませんでした"
-                  }
-                </p>
-
-                <p>
-                  <strong>
-                    公式サイト
-                  </strong>
-                </p>
-
-                <p>
-                  ${
-                    place.website
-                      ? `<a href="${place.website}" target="_blank">ウェブサイトを見る</a>`
-                      : "情報なし"
-                  }
-                </p>
-
-                ${
-                  facilityType === "onsen"
-                    ? `
-                      <button
-                        id="favorite-toggle-button"
-                        type="button"
-                      >
-                        キャンプ場・温泉情報を保存
-                      </button>
-                    `
-                    : ""
-                }
-
-              </div>
-            `;
-
-            if (facilityType === "onsen") {
-              setupFavoriteButton(
-                campsite.place_id,
-                place.place_id
-              );
-            }
-          }
+        openFacilityDetails(
+          selectedFacility,
+          service,
+          campsite,
+          facilityType
         );
       }
     );
@@ -2342,19 +2547,16 @@ function setupCloseButtons() {
       "close-campsite-panel"
     );
 
-
   if (closeButton) {
 
     closeButton.replaceWith(
       closeButton.cloneNode(true)
     );
 
-
     const newCloseButton =
       document.getElementById(
         "close-campsite-panel"
       );
-
 
     newCloseButton.addEventListener(
       "click",
@@ -2365,9 +2567,7 @@ function setupCloseButtons() {
             ".search-container"
           );
 
-
         if (searchContainer) {
-
           searchContainer.classList.remove(
             "campsite-open"
           );
@@ -2379,47 +2579,44 @@ function setupCloseButtons() {
           searchContainer.classList.remove(
             "campsite-image-open"
           );
-        }
 
+          searchContainer.classList.remove(
+            "weather-open"
+          );
+        }
 
         const campsitePanel =
           document.getElementById(
             "campsite-panel"
           );
 
-
         if (campsitePanel) {
-
           campsitePanel.classList.add(
             "hidden"
           );
         }
 
-
         newCloseButton.classList.add(
           "hidden"
         );
 
-
         closeOnsenPanel();
         closeCampsiteImagePanel();
         closeWeatherPanel();
-
 
         const panelContent =
           document.getElementById(
             "campsite-content"
           );
 
-
         if (panelContent) {
-
           panelContent.innerHTML = `
             <h2>キャンプ場情報</h2>
             <p>キャンプ場を選択してください</p>
           `;
         }
 
+        showCampsiteSearchMarkers();
 
         resizeMap();
       }
@@ -2431,19 +2628,16 @@ function setupCloseButtons() {
       "close-onsen-panel"
     );
 
-
   if (closeOnsenButton) {
 
     closeOnsenButton.replaceWith(
       closeOnsenButton.cloneNode(true)
     );
 
-
     const newCloseOnsenButton =
       document.getElementById(
         "close-onsen-panel"
       );
-
 
     newCloseOnsenButton.addEventListener(
       "click",
@@ -2451,6 +2645,10 @@ function setupCloseButtons() {
 
         closeOnsenPanel();
         closeWeatherPanel();
+
+        restoreSelectedCampsiteAndFacilities();
+
+        resizeMap();
       }
     );
   }
@@ -2460,19 +2658,16 @@ function setupCloseButtons() {
       "close-campsite-image-panel"
     );
 
-
   if (closeImageButton) {
 
     closeImageButton.replaceWith(
       closeImageButton.cloneNode(true)
     );
 
-
     const newCloseImageButton =
       document.getElementById(
         "close-campsite-image-panel"
       );
-
 
     newCloseImageButton.addEventListener(
       "click",
@@ -2480,32 +2675,41 @@ function setupCloseButtons() {
 
         closeCampsiteImagePanel();
         closeWeatherPanel();
+
+        restoreSelectedCampsiteAndFacilities();
+
+        resizeMap();
       }
     );
-    const closeWeatherButton =
+  }
+
+  const closeWeatherButton =
+    document.getElementById(
+      "close-weather-panel"
+    );
+
+  if (closeWeatherButton) {
+
+    closeWeatherButton.replaceWith(
+      closeWeatherButton.cloneNode(true)
+    );
+
+    const newCloseWeatherButton =
       document.getElementById(
         "close-weather-panel"
       );
 
-    if (closeWeatherButton) {
+    newCloseWeatherButton.addEventListener(
+      "click",
+      () => {
 
-      closeWeatherButton.replaceWith(
-        closeWeatherButton.cloneNode(true)
-      );
+        closeWeatherPanel();
 
-      const newCloseWeatherButton =
-        document.getElementById(
-          "close-weather-panel"
-        );
+        restoreSelectedCampsiteAndFacilities();
 
-      newCloseWeatherButton.addEventListener(
-        "click",
-        () => {
-
-          closeWeatherPanel();
-        }
-      );
-    }
+        resizeMap();
+      }
+    );
   }
 }
 
