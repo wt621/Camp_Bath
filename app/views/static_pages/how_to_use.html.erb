@@ -1,0 +1,193 @@
+<div class="how-to-use">
+  <div class="how-to-use-title">
+    <h1>Camp-Bathとは</h1>
+  </div>
+
+  <div class="how-to-use-intro">
+    <p>
+      キャンプ場と、その周辺の施設の営業時間などの情報を<br>
+      一目で確認するアプリです。
+    </p>
+
+    <h2>使用方法</h2>
+  </div>
+
+  <section class="how-to-use-section">
+    <h2>1. TOP画面</h2>
+    <p>
+      「検索する」から地域を選択してキャンプ場を検索します。
+    </p>
+
+    <%= image_tag "how_to_use/01_top.png",
+                  alt: "TOP画面",
+                  class: "how-to-use-screenshot" %>
+  </section>
+
+  <section class="how-to-use-section">
+    <h2>2. 地方選択画面</h2>
+    <p>
+      地方を選択してください。
+    </p>
+
+    <%= image_tag "how_to_use/02_regions.png",
+                  alt: "地方選択画面",
+                  class: "how-to-use-screenshot" %>
+  </section>
+
+  <section class="how-to-use-section">
+    <h2>3. 都道府県選択画面</h2>
+    <p>
+      都道府県を選択してください。
+    </p>
+
+    <%= image_tag "how_to_use/03_prefectures.png",
+                  alt: "都道府県選択画面",
+                  class: "how-to-use-screenshot" %>
+  </section>
+
+  <section class="how-to-use-section">
+    <h2>4. エリア選択画面</h2>
+    <p>
+      エリアを選択してください。
+    </p>
+
+    <%= image_tag "how_to_use/04_areas.png",
+                  alt: "エリア選択画面",
+                  class: "how-to-use-screenshot" %>
+  </section>
+
+  <section class="how-to-use-section">
+    <h2>5. 地図画面</h2>
+    <p>
+      地図上のキャンプ場マーカー 「⛺」 からキャンプ場を選択してください。
+    </p>
+
+    <%= image_tag "how_to_use/05_map.png",
+                  alt: "地図画面",
+                  class: "how-to-use-screenshot" %>
+  </section>
+
+  <section class="how-to-use-section">
+    <h2>6. キャンプ場詳細画面</h2>
+
+    <p>
+      選択したキャンプ場の詳細が表示されます。（※1）
+    </p>
+
+    <ul>
+      <li>
+        <strong>キャンプ場の画像を見る：</strong>
+        キャンプ場の画像が1枚確認できます。（※2）
+        <br>
+        それ以上の情報を確認したい場合は「ウェブサイトを見る」をクリックしてください。
+      </li>
+      <li>
+        <strong>キャンプ場の天気を見る：</strong>
+        キャンプ場の天気を確認できます。（※3）
+      </li>
+    </ul>
+
+    <p>
+      選択したキャンプ場の周辺の施設を選択します。（※4）
+    </p>
+
+    <ul>
+      <li>温泉</li>
+      <li>販売店（コンビニ・スーパーなど）</li>
+    </ul>
+
+    <p>
+      温泉・商業施設共に近い順で上位3つが選択可能です。
+    </p>
+
+    <div class="how-to-use-note">
+      <p>
+        ※温泉施設名の下の距離は直線距離で約〇〇キロと表示されます。
+        正確な距離と所要時間は温泉施設を選択した時に計算し表示されるため差異がでます。
+      </p>
+    </div>
+
+    <%= image_tag "how_to_use/06_campsite_detail.png",
+                  alt: "キャンプ場詳細画面",
+                  class: "how-to-use-screenshot" %>
+  </section>
+
+  <section class="how-to-use-section">
+    <h2>7. 温泉施設を選択・温泉施設詳細画面</h2>
+
+    <p>
+      施設情報が確認できます。
+    </p>
+
+    <p>
+      「キャンプ場・温泉情報を保存」ボタンをクリックすると
+      2つの施設をセットで保存できます。
+    </p>
+
+    <div class="how-to-use-note">
+      <p>
+        ※お気に入り機能を利用するにはアカウント登録が必須です。
+      </p>
+    </div>
+
+    <%= image_tag "how_to_use/07_onsen_detail.png",
+                  alt: "温泉施設詳細画面",
+                  class: "how-to-use-screenshot" %>
+  </section>
+
+  <section class="how-to-use-section">
+    <h2>8. 商業施設を選択</h2>
+
+    <p>
+      商業施設の詳細情報が確認できます。
+    </p>
+
+    <%= image_tag "how_to_use/08_shop_detail.png",
+                  alt: "商業施設詳細画面",
+                  class: "how-to-use-screenshot" %>
+  </section>
+
+  <section class="how-to-use-section">
+    <h2>9. 現在地から探す</h2>
+
+    <p>
+      現在地ボタンを使用すると、現在地を基準にキャンプ場を検索できます。
+    </p>
+
+    <div class="how-to-use-note">
+      <p>
+        ※GPSボタン使用時にブラウザでは大きな誤差が出る場合があります。
+      </p>
+    </div>
+
+    <%= image_tag "how_to_use/09_current_location.png",
+                  alt: "現在地から探す画面",
+                  class: "how-to-use-screenshot" %>
+  </section>
+
+  <section class="how-to-use-section">
+    <h2>10. お気に入りページ</h2>
+
+    <p>
+      画面右上の「三」からお気に入りページに飛べます。
+    </p>
+
+    <p>
+      登録したキャンプ場と温泉施設のセットが表示されます。
+    </p>
+
+    <p>
+      登録したセットをクリックするとマップに飛びます。
+    </p>
+
+    <div class="how-to-use-screenshots">
+      <%= image_tag "how_to_use/10_favorites_button.png",
+                alt: "お気に入りボタン",
+                class: "how-to-use-screenshot" %>
+
+      <%= image_tag "how_to_use/11_favorites.png",
+                alt: "お気に入りページ",
+                class: "how-to-use-screenshot" %>
+    </div>
+  </section>
+</div>

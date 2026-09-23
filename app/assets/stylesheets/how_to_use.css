@@ -1,0 +1,110 @@
+.how-to-use {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  text-align: left;
+}
+
+.how-to-use-title {
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.how-to-use-intro {
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.how-to-use-section {
+  margin-bottom: 50px;
+  padding: 25px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.how-to-use-section h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 24px;
+}
+
+.how-to-use-section p {
+  margin: 10px 0;
+  line-height: 1.8;
+}
+
+.how-to-use-section ul {
+  margin: 15px 0;
+  padding-left: 25px;
+}
+
+.how-to-use-section li {
+  margin-bottom: 8px;
+  line-height: 1.7;
+}
+
+.how-to-use-screenshot {
+  display: block;
+  width: 100%;
+  max-width: 700px;
+  height: auto;
+  margin: 25px auto 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.how-to-use-note {
+  margin-top: 15px;
+  padding: 12px 15px;
+  background: #f7f7f7;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.how-to-use-screenshots {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+  margin-top: 25px;
+}
+
+.how-to-use-screenshots .how-to-use-screenshot {
+  width: calc(50% - 10px);
+  max-width: 340px;
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .how-to-use-screenshots {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .how-to-use-screenshots .how-to-use-screenshot {
+    width: 100%;
+    max-width: 700px;
+  }
+}
+
+@media (max-width: 600px) {
+  .how-to-use {
+    padding: 20px 15px;
+  }
+
+  .how-to-use-section {
+    padding: 20px 15px;
+    margin-bottom: 30px;
+  }
+
+  .how-to-use-section h2 {
+    font-size: 20px;
+  }
+
+  .how-to-use-screenshot {
+    margin-top: 20px;
+  }
+}
