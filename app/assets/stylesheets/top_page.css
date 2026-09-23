@@ -65,6 +65,13 @@
     gap: 15px;
   }
 
+  .bottom-actions-guest {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    justify-content: center;
+    gap: 15px;
+  }
+
   .btn-search-top {
     font-size: 14px;
     padding: 12px 30px;
