@@ -1,3 +1,7 @@
+import {
+  setActivePanel
+} from "panel_manager";
+
 const FACILITY_SEARCH_RADIUS = 10000;
 const FACILITY_RESULT_COUNT = 3;
 const MARKER_ICON_SIZE = 32;
@@ -293,19 +297,7 @@ function openCampsiteDetails(
 
   panel.classList.remove("hidden");
 
-  if (searchContainer) {
-    searchContainer.classList.add(
-      "campsite-open"
-    );
-
-    searchContainer.classList.remove(
-      "onsen-open"
-    );
-
-    searchContainer.classList.remove(
-      "campsite-image-open"
-    );
-  }
+  setActivePanel("campsite-open");
 
   const closeButton =
     document.getElementById(
@@ -1282,22 +1274,12 @@ function openWeatherPanel(campsite) {
     "hidden"
   );
 
-  searchContainer.classList.add(
-    "weather-open"
-  );
+  setActivePanel("weather-open");
 
   fetchWeatherForecast(
     campsite
   );
-
-  searchContainer.classList.remove(
-    "onsen-open"
-  );
-
-  searchContainer.classList.remove(
-    "campsite-image-open"
-  );
-
+  
   if (closeButton) {
 
     closeButton.classList.remove(
@@ -1745,15 +1727,7 @@ function openFacilityDetails(
         "hidden"
       );
 
-      if (searchContainer) {
-        searchContainer.classList.add(
-          "onsen-open"
-        );
-
-        searchContainer.classList.remove(
-          "campsite-image-open"
-        );
-      }
+      setActivePanel("onsen-open");
 
       const closeOnsenButton =
         document.getElementById(
