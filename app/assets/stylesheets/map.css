@@ -40,13 +40,15 @@
   flex: 0 0 70%;
 }
 
-.search-container.campsite-open.onsen-open #map-container {
+.search-container.campsite-open.onsen-open #map-container,
+.search-container.onsen-open #map-container {
   width: 40%;
   flex: 0 0 40%;
 }
 
 .search-container.campsite-open.onsen-open #campsite-panel,
-.search-container.campsite-open.onsen-open #onsen-panel {
+.search-container.campsite-open.onsen-open #onsen-panel,
+.search-container.onsen-open #onsen-panel {
   width: 30%;
   flex: 0 0 30%;
 }
