@@ -2,195 +2,28 @@ import {
   setActivePanel
 } from "panel_manager";
 
+import {
+  getMarkerIcon,
+  isCampsite,
+  clearCampsiteMarkers,
+  clearFacilityMarkers,
+  showSelectedCampsiteMarker,
+  showCampsiteSearchMarkers,
+  showFacilityMarkers,
+  showSelectedCampsiteAndFacilities
+} from "map_markers";
+
 const FACILITY_SEARCH_RADIUS = 10000;
 const FACILITY_RESULT_COUNT = 3;
-const MARKER_ICON_SIZE = 32;
-
-function getMarkerIcon(iconName) {
-  return {
-    url: `/assets/${iconName}`,
-    scaledSize: new google.maps.Size(
-      MARKER_ICON_SIZE,
-      MARKER_ICON_SIZE
-    ),
-    anchor: new google.maps.Point(
-      MARKER_ICON_SIZE / 2,
-      MARKER_ICON_SIZE
-    )
-  };
-}
 
 let map;
 let currentLocationMarker;
 
-let campsiteMarkers = [];
-let facilityMarkers = [];
-
-let selectedCampsiteMarker = null;
 let selectedCampsite = null;
 
 let campsiteSearchResults = [];
 let currentFacilityResults = [];
 let currentFacilityType = null;
-
-function isCampsite(place) {
-  const name = place.name || "";
-
-  const excludeWords = [
-    "株式会社",
-    "会社",
-    "ラボラトリー",
-    "オペレーション",
-    "小貝川リバーサイドパーク",
-    "生牧草専門 中央牧草センター"
-  ];
-
-  return !excludeWords.some(word => name.includes(word));
-}
-
-function clearCampsiteMarkers() {
-  campsiteMarkers.forEach(marker => {
-    marker.setMap(null);
-  });
-
-  campsiteMarkers = [];
-}
-
-function clearFacilityMarkers() {
-  facilityMarkers.forEach(marker => {
-    marker.setMap(null);
-  });
-
-  facilityMarkers = [];
-}
-
-function showSelectedCampsiteMarker(campsite) {
-  clearCampsiteMarkers();
-
-  const marker = new google.maps.Marker({
-    position: campsite.geometry.location,
-    map: map,
-    title: campsite.name,
-    icon: getMarkerIcon("Camp-icon.png")
-  });
-
-  marker.addListener("click", () => {
-    const service =
-      new google.maps.places.PlacesService(map);
-
-    openCampsiteDetails(
-      campsite,
-      service
-    );
-  });
-
-  campsiteMarkers.push(marker);
-  selectedCampsiteMarker = marker;
-}
-
-function restoreSelectedCampsiteAndFacilities() {
-  if (
-    !selectedCampsite ||
-    !selectedCampsite.geometry ||
-    !selectedCampsite.geometry.location
-  ) {
-    showCampsiteSearchMarkers();
-    return;
-  }
-
-  showSelectedCampsiteMarker(
-    selectedCampsite
-  );
-
-  if (
-    currentFacilityResults.length > 0 &&
-    currentFacilityType
-  ) {
-    showFacilityMarkers(
-      currentFacilityResults,
-      selectedCampsite,
-      currentFacilityType
-    );
-  }
-}
-
-function showCampsiteSearchMarkers() {
-  clearCampsiteMarkers();
-  clearFacilityMarkers();
-
-  campsiteSearchResults.forEach(campsite => {
-    if (
-      !campsite.geometry ||
-      !campsite.geometry.location
-    ) {
-      return;
-    }
-
-    const marker = new google.maps.Marker({
-      position: campsite.geometry.location,
-      map: map,
-      title: campsite.name,
-      icon: getMarkerIcon("Camp-icon.png")
-    });
-
-    const service =
-      new google.maps.places.PlacesService(map);
-
-    marker.addListener("click", () => {
-      openCampsiteDetails(
-        campsite,
-        service
-      );
-    });
-
-    campsiteMarkers.push(marker);
-  });
-
-  selectedCampsiteMarker = null;
-  selectedCampsite = null;
-}
-
-function showFacilityMarkers(
-  facilities,
-  campsite,
-  facilityType
-) {
-  clearFacilityMarkers();
-
-  facilities.forEach(facility => {
-    if (
-      !facility.geometry ||
-      !facility.geometry.location
-    ) {
-      return;
-    }
-
-    const marker = new google.maps.Marker({
-      position: facility.geometry.location,
-      map: map,
-      title: facility.name,
-      icon: getMarkerIcon(
-        facilityType === "onsen"
-          ? "Onsen-icon.png"
-          : "Shop-icon.png"
-      )
-    });
-
-    marker.addListener("click", () => {
-      const service =
-        new google.maps.places.PlacesService(map);
-
-      openFacilityDetails(
-        facility,
-        service,
-        campsite,
-        facilityType
-      );
-    });
-
-    facilityMarkers.push(marker);
-  });
-}
 
 function searchCampsites(center) {
   if (!map) {
@@ -208,10 +41,10 @@ function searchCampsites(center) {
     return;
   }
 
+  clearCampsiteMarkers();
   clearFacilityMarkers();
 
   selectedCampsite = null;
-  selectedCampsiteMarker = null;
   currentFacilityResults = [];
   currentFacilityType = null;
 
@@ -244,23 +77,11 @@ function searchCampsites(center) {
           campsite.geometry.location
       );
 
-      campsiteSearchResults.forEach(campsite => {
-        const marker = new google.maps.Marker({
-          position: campsite.geometry.location,
-          map: map,
-          title: campsite.name,
-          icon: getMarkerIcon("Camp-icon.png")
-        });
-
-        campsiteMarkers.push(marker);
-
-        marker.addListener("click", () => {
-          openCampsiteDetails(
-          campsite,
-            service
-          );
-        });
-      });
+      showCampsiteSearchMarkers(
+        map,
+        campsiteSearchResults,
+        openCampsiteDetails
+      );
     }
   );
 }
@@ -359,7 +180,11 @@ function openCampsiteDetails(
         return;
       }
 
-      showSelectedCampsiteMarker(place);
+      showSelectedCampsiteMarker(
+        map,
+        place,
+        openCampsiteDetails
+      );
 
       searchNearbyFacilities(
         place,
@@ -635,9 +460,11 @@ function searchNearbyFacilities(
         );
 
         showFacilityMarkers(
+          map,
           topFacilities,
           campsite,
-          "onsen"
+          "onsen",
+          openFacilityDetails
         );
 
         setupFacilityClickEvents(
@@ -764,9 +591,11 @@ function searchCommercialFacilities(
       );
 
       showFacilityMarkers(
+        map,
         facilitiesWithDistance,
         campsite,
-        "commercial"
+        "commercial",
+        openFacilityDetails
       );
 
       setupFacilityClickEvents(
@@ -1633,9 +1462,12 @@ function openFacilityDetails(
   facilityType
 ) {
   clearFacilityMarkers();
-  if (selectedCampsiteMarker) {
-    selectedCampsiteMarker.setMap(map);
-  }
+
+  showSelectedCampsiteMarker(
+    map,
+    campsite,
+    openCampsiteDetails
+  );
 
   service.getDetails(
     {
@@ -1666,36 +1498,18 @@ function openFacilityDetails(
 
       clearFacilityMarkers();
 
-      if (selectedCampsiteMarker) {
-        selectedCampsiteMarker.setMap(map);
-      }
-
-      const facilityMarker =
-        new google.maps.Marker({
-          position: place.geometry.location,
-          map: map,
-          title: place.name,
-          icon: getMarkerIcon(
-            facilityType === "onsen"
-              ? "Onsen-icon.png"
-              : "Shop-icon.png"
-          )
-        });
-
-      facilityMarker.addListener(
-        "click",
-        () => {
-          openFacilityDetails(
-            place,
-            service,
-            campsite,
-            facilityType
-          );
-        }
+      showSelectedCampsiteMarker(
+        map,
+        campsite,
+        openCampsiteDetails
       );
 
-      facilityMarkers.push(
-        facilityMarker
+      showFacilityMarkers(
+        map,
+        [place],
+        campsite,
+        facilityType,
+        openFacilityDetails
       );
 
       const searchContainer =
@@ -2624,7 +2438,11 @@ function setupCloseButtons() {
           `;
         }
 
-        showCampsiteSearchMarkers();
+        showCampsiteSearchMarkers(
+          map,
+          campsiteSearchResults,
+          openCampsiteDetails
+        );
 
         resizeMap();
       }
@@ -2654,8 +2472,15 @@ function setupCloseButtons() {
         closeOnsenPanel();
         closeWeatherPanel();
 
-        restoreSelectedCampsiteAndFacilities();
-
+        showSelectedCampsiteAndFacilities(
+          map,
+          selectedCampsite,
+          campsiteSearchResults,
+          currentFacilityResults,
+          currentFacilityType,
+          openCampsiteDetails,
+          openFacilityDetails
+        );
         resizeMap();
       }
     );
@@ -2684,7 +2509,15 @@ function setupCloseButtons() {
         closeCampsiteImagePanel();
         closeWeatherPanel();
 
-        restoreSelectedCampsiteAndFacilities();
+        showSelectedCampsiteAndFacilities(
+          map,
+          selectedCampsite,
+          campsiteSearchResults,
+          currentFacilityResults,
+          currentFacilityType,
+          openCampsiteDetails,
+          openFacilityDetails
+        );
 
         resizeMap();
       }
@@ -2713,7 +2546,15 @@ function setupCloseButtons() {
 
         closeWeatherPanel();
 
-        restoreSelectedCampsiteAndFacilities();
+        showSelectedCampsiteAndFacilities(
+          map,
+          selectedCampsite,
+          campsiteSearchResults,
+          currentFacilityResults,
+          currentFacilityType,
+          openCampsiteDetails,
+          openFacilityDetails
+        );
 
         resizeMap();
       }
