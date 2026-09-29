@@ -13,7 +13,11 @@ import {
   showSelectedCampsiteAndFacilities
 } from "map_markers";
 
-const FACILITY_SEARCH_RADIUS = 10000;
+import {
+  searchCampsites as searchCampsitesFromMaps,
+  searchNearbyFacilities as searchNearbyFacilitiesFromMaps
+} from "map_search";
+
 const FACILITY_RESULT_COUNT = 3;
 
 let map;
@@ -31,8 +35,6 @@ function searchCampsites(center) {
     return;
   }
 
-  const service = new google.maps.places.PlacesService(map);
-
   const panel = document.getElementById("campsite-panel");
   const panelContent = document.getElementById("campsite-content");
 
@@ -48,14 +50,10 @@ function searchCampsites(center) {
   currentFacilityResults = [];
   currentFacilityType = null;
 
-  service.nearbySearch(
-    {
-      location: center,
-      radius: 50000,
-      type: "campground"
-    },
+  searchCampsitesFromMaps(
+    map,
+    center,
     (results, status) => {
-
       if (
         status !==
         google.maps.places.PlacesServiceStatus.OK
@@ -393,216 +391,108 @@ function searchNearbyFacilities(
     );
   };
 
-  if (facilityType === "onsen") {
-    service.nearbySearch(
-      {
-        location:
-          campsite.geometry.location,
-
-        radius:
-          FACILITY_SEARCH_RADIUS,
-
-        keyword:
-          "温泉"
-      },
-
-      (results, status) => {
-        let topFacilities = [];
-
-        if (
-          status ===
-            google.maps.places.PlacesServiceStatus.OK &&
-          results &&
-          results.length > 0
-        ) {
-          topFacilities =
-            results
-              .filter(
-                facility =>
-                  facility.geometry &&
-                  facility.geometry.location
-              )
-              .map(facility => {
-                const distance =
-                  google.maps.geometry.spherical
-                    .computeDistanceBetween(
-                      campsite.geometry.location,
-                      facility.geometry.location
-                    );
-
-                return {
-                  ...facility,
-                  distance
-                };
-              })
-              .sort(
-                (a, b) =>
-                  a.distance - b.distance
-              )
-              .slice(
-                0,
-                FACILITY_RESULT_COUNT
-              );
-        }
-
-        currentFacilityResults =
-          topFacilities;
-
-        const listHTML =
-          renderFacilityList(
-            topFacilities,
-            "付近の温泉施設情報"
-          );
-
-        renderCampsiteContent(
-          listHTML,
-          "onsen"
-        );
-
-        showFacilityMarkers(
-          map,
-          topFacilities,
-          campsite,
-          "onsen",
-          openFacilityDetails
-        );
-
-        setupFacilityClickEvents(
-          topFacilities,
-          service,
-          campsite,
-          "onsen"
-        );
+  searchNearbyFacilitiesFromMaps(
+    map,
+    campsite,
+    facilityType,
+    (results, status) => {
+      if (
+        facilityType === "onsen" &&
+        status !==
+          google.maps.places.PlacesServiceStatus.OK
+      ) {
+        return;
       }
-    );
 
-    return;
-  }
+      let topFacilities = [];
 
-  if (facilityType === "commercial") {
-    searchCommercialFacilities(
-      campsite,
-      service,
-      renderFacilityList,
-      renderCampsiteContent
-    );
-  }
-}
-
-function searchCommercialFacilities(
-  campsite,
-  service,
-  renderFacilityList,
-  renderCampsiteContent
-) {
-
-  const searchPlace = placeType => {
-    return new Promise(resolve => {
-      service.nearbySearch(
-        {
-          location:
-            campsite.geometry.location,
-
-          radius:
-            FACILITY_SEARCH_RADIUS,
-
-          type: placeType
-        },
-
-        (results, status) => {
-          if (
-            status !==
-            google.maps.places.PlacesServiceStatus.OK
-          ) {
-            resolve([]);
-            return;
-          }
-
-          resolve(results || []);
-        }
-      );
-    });
-  };
-
-  Promise.all([
-    searchPlace("supermarket"),
-    searchPlace("convenience_store")
-  ]).then(
-    ([supermarkets, convenienceStores]) => {
-      const allFacilities = [
-        ...supermarkets,
-        ...convenienceStores
-      ];
-
-      const uniqueFacilities =
-        Array.from(
-          new Map(
-            allFacilities
-              .filter(
-                facility => facility.place_id
+      if (
+        status ===
+          google.maps.places.PlacesServiceStatus.OK &&
+        results &&
+        results.length > 0
+      ) {
+        const uniqueFacilities =
+          facilityType === "commercial"
+            ? Array.from(
+                new Map(
+                  results
+                    .filter(
+                      facility =>
+                        facility.place_id
+                    )
+                    .map(
+                      facility => [
+                        facility.place_id,
+                        facility
+                      ]
+                    )
+                ).values()
               )
-              .map(
-                facility => [
-                  facility.place_id,
-                  facility
-                ]
-              )
-          ).values()
-        );
+            : results;
 
-      const facilitiesWithDistance =
-        uniqueFacilities
-          .filter(
-            facility =>
-              facility.geometry &&
-              facility.geometry.location
-          )
-          .map(facility => {
-            const distance =
-              google.maps.geometry.spherical
-                .computeDistanceBetween(
-                  campsite.geometry.location,
-                  facility.geometry.location
-                );
+        topFacilities =
+          uniqueFacilities
+            .filter(
+              facility =>
+                facility.geometry &&
+                facility.geometry.location
+            )
+            .map(facility => {
+              const distance =
+                google.maps.geometry.spherical
+                  .computeDistanceBetween(
+                    campsite.geometry.location,
+                    facility.geometry.location
+                  );
 
-            return {
-              ...facility,
-              distance
-            };
-          })
-          .sort(
-            (a, b) =>
-              a.distance - b.distance
-          )
-          .slice(
-            0,
-            FACILITY_RESULT_COUNT
-          );
+              return {
+                ...facility,
+                distance
+              };
+            })
+            .sort(
+              (a, b) =>
+                a.distance - b.distance
+            )
+            .slice(
+              0,
+              FACILITY_RESULT_COUNT
+            );
+      }
+
+      currentFacilityResults =
+        topFacilities;
+
+      const title =
+        facilityType === "onsen"
+          ? "付近の温泉施設情報"
+          : "付近の商業施設情報";
 
       const listHTML =
         renderFacilityList(
-          facilitiesWithDistance,
-          "付近の商業施設情報"
+          topFacilities,
+          title
         );
 
       renderCampsiteContent(
         listHTML,
-        "commercial"
+        facilityType
       );
 
       showFacilityMarkers(
         map,
-        facilitiesWithDistance,
+        topFacilities,
         campsite,
-        "commercial",
+        facilityType,
         openFacilityDetails
       );
 
       setupFacilityClickEvents(
-        facilitiesWithDistance,
+        topFacilities,
         service,
         campsite,
-        "commercial"
+        facilityType
       );
     }
   );
