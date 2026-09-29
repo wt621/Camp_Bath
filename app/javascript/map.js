@@ -3,6 +3,11 @@ import {
 } from "panel_manager";
 
 import {
+  setupWeatherButton,
+  closeWeatherPanel
+} from "weather";
+
+import {
   getMarkerIcon,
   isCampsite,
   clearCampsiteMarkers,
@@ -17,6 +22,11 @@ import {
   searchCampsites as searchCampsitesFromMaps,
   searchNearbyFacilities as searchNearbyFacilitiesFromMaps
 } from "map_search";
+
+import {
+  setupCampsiteImageButton,
+  closeCampsiteImagePanel
+} from "campsite_image";
 
 const FACILITY_RESULT_COUNT = 3;
 
@@ -111,8 +121,12 @@ function openCampsiteDetails(
     );
 
   closeOnsenPanel();
-  closeCampsiteImagePanel();
-  closeWeatherPanel();
+  closeCampsiteImagePanel(
+    resizeMap
+  );
+  closeWeatherPanel(
+    resizeMap
+  );
 
   panel.classList.remove("hidden");
 
@@ -378,11 +392,18 @@ function searchNearbyFacilities(
     `;
 
     setupCampsiteImageButton(
-      campsite
+      campsite,
+      closeOnsenPanel,
+      closeWeatherPanel,
+      resizeMap,
+      map
     );
 
     setupWeatherButton(
-      campsite
+      campsite,
+      closeOnsenPanel,
+      closeCampsiteImagePanel,
+      resizeMap
     );
 
     setupFacilityTabs(
@@ -536,815 +557,6 @@ function setupFacilityTabs(
   });
 }
 
-function setupCampsiteImageButton(
-  campsite
-) {
-
-  const button =
-    document.getElementById(
-      "campsite-image-open-button"
-    );
-
-  if (!button) {
-    return;
-  }
-
-  button.addEventListener(
-    "click",
-    () => {
-
-      openCampsiteImagePanel(
-        campsite
-      );
-    }
-  );
-}
-
-function openCampsiteImagePanel(campsite) {
-  const searchContainer =
-    document.querySelector(
-      ".search-container"
-    );
-
-  const imagePanel =
-    document.getElementById(
-      "campsite-image-panel"
-    );
-
-  const imageContent =
-    document.getElementById(
-      "campsite-image-content"
-    );
-
-  const closeButton =
-    document.getElementById(
-      "close-campsite-image-panel"
-    );
-
-  if (
-    !searchContainer ||
-    !imagePanel ||
-    !imageContent
-  ) {
-    console.error(
-      "キャンプ場画像パネルが見つかりません"
-    );
-
-    return;
-  }
-
-  closeOnsenPanel();
-  closeWeatherPanel();
-
-  imagePanel.classList.remove(
-    "hidden"
-  );
-
-  searchContainer.classList.add(
-    "campsite-image-open"
-  );
-
-  searchContainer.classList.remove(
-    "onsen-open"
-  );
-
-  if (closeButton) {
-    closeButton.classList.remove(
-      "hidden"
-    );
-  }
-
-  imageContent.innerHTML = `
-    <h2>キャンプ場画像</h2>
-
-    <div class="campsite-image-loading">
-      <p>画像を読み込んでいます...</p>
-    </div>
-  `;
-
-  resizeMap();
-
-  if (
-    typeof google === "undefined" ||
-    !google.maps ||
-    !google.maps.places
-  ) {
-    console.error(
-      "Google Maps Places APIが利用できません"
-    );
-
-    imageContent.innerHTML = `
-      <h2>キャンプ場画像</h2>
-
-      <p>
-        画像を取得できませんでした。
-      </p>
-    `;
-
-    return;
-  }
-
-  const service =
-    new google.maps.places.PlacesService(
-      map
-    );
-
-  service.getDetails(
-    {
-      placeId: campsite.place_id,
-
-      fields: [
-        "name",
-        "photos"
-      ]
-    },
-
-    (place, status) => {
-      if (
-        status !==
-          google.maps.places.PlacesServiceStatus.OK ||
-        !place
-      ) {
-        console.error(
-          "キャンプ場の画像情報を取得できませんでした:",
-          status
-        );
-
-        imageContent.innerHTML = `
-          <h2>キャンプ場画像</h2>
-
-          <div class="campsite-image-placeholder">
-            <div class="campsite-image-placeholder-icon">
-              🏕️
-            </div>
-
-            <p>
-              ${campsite.name}
-            </p>
-
-            <p class="image-placeholder-text">
-              画像を取得できませんでした
-            </p>
-          </div>
-        `;
-
-        return;
-      }
-
-      if (
-        !place.photos ||
-        place.photos.length === 0
-      ) {
-        imageContent.innerHTML = `
-          <h2>キャンプ場画像</h2>
-
-          <div class="campsite-image-placeholder">
-            <div class="campsite-image-placeholder-icon">
-              🏕️
-            </div>
-
-            <p>
-              ${place.name || campsite.name}
-            </p>
-
-            <p class="image-placeholder-text">
-              このキャンプ場の画像はありません
-            </p>
-          </div>
-        `;
-
-        return;
-      }
-
-      const photo =
-        place.photos[0];
-
-      const imageUrl =
-        photo.getUrl({
-          maxWidth: 800,
-          maxHeight: 600
-        });
-
-      let attributionHTML = "";
-
-      if (
-        photo.html_attributions &&
-        photo.html_attributions.length > 0
-      ) {
-        attributionHTML = `
-          <div class="campsite-image-attribution">
-            ${photo.html_attributions.join(" ")}
-          </div>
-        `;
-      }
-
-      imageContent.innerHTML = `
-        <h2>キャンプ場画像</h2>
-
-        <div class="campsite-image-container">
-
-          <img
-            src="${imageUrl}"
-            alt="${place.name || campsite.name}"
-            class="campsite-image"
-          >
-
-          <p class="campsite-image-name">
-            ${place.name || campsite.name}
-          </p>
-
-          ${attributionHTML}
-
-        </div>
-      `;
-    }
-  );
-}
-
-function formatDateLabel(dateString, index) {
-
-  const date = new Date(dateString);
-
-  const dayOfWeek = [
-    "日",
-    "月",
-    "火",
-    "水",
-    "木",
-    "金",
-    "土"
-  ][date.getDay()];
-
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-
-  if (index === 0) {
-
-    return `昨日${month}/${day}(${dayOfWeek})`;
-
-  } else if (index === 1) {
-
-    return `今日${month}/${day}(${dayOfWeek})`;
-
-  } else if (index === 2) {
-
-    return `明日${month}/${day}(${dayOfWeek})`;
-
-  } else {
-
-    return `${month}/${day}(${dayOfWeek})`;
-
-  }
-}
-
-function getWeatherDescription(weatherCode) {
-
-  const weatherDescriptions = {
-
-    0: {
-      description: "快晴",
-      icon: "☀️"
-    },
-
-    1: {
-      description: "晴れ",
-      icon: "🌤️"
-    },
-
-    2: {
-      description: "一部曇り",
-      icon: "⛅"
-    },
-
-    3: {
-      description: "曇り",
-      icon: "☁️"
-    },
-
-    45: {
-      description: "霧",
-      icon: "🌫️"
-    },
-
-    48: {
-      description: "霧",
-      icon: "🌫️"
-    },
-
-    51: {
-      description: "弱い霧雨",
-      icon: "🌦️"
-    },
-
-    53: {
-      description: "霧雨",
-      icon: "🌦️"
-    },
-
-    55: {
-      description: "強い霧雨",
-      icon: "🌧️"
-    },
-
-    61: {
-      description: "弱い雨",
-      icon: "🌧️"
-    },
-
-    63: {
-      description: "雨",
-      icon: "🌧️"
-    },
-
-    65: {
-      description: "強い雨",
-      icon: "🌧️"
-    },
-
-    71: {
-      description: "弱い雪",
-      icon: "🌨️"
-    },
-
-    73: {
-      description: "雪",
-      icon: "❄️"
-    },
-
-    75: {
-      description: "強い雪",
-      icon: "❄️"
-    },
-
-    80: {
-      description: "弱いにわか雨",
-      icon: "🌦️"
-    },
-
-    81: {
-      description: "にわか雨",
-      icon: "🌧️"
-    },
-
-    82: {
-      description: "強いにわか雨",
-      icon: "🌧️"
-    },
-
-    85: {
-      description: "弱いにわか雪",
-      icon: "🌨️"
-    },
-
-    86: {
-      description: "強いにわか雪",
-      icon: "❄️"
-    },
-
-    95: {
-      description: "雷雨",
-      icon: "⛈️"
-    },
-
-    96: {
-      description: "雷雨・ひょう",
-      icon: "⛈️"
-    },
-
-    99: {
-      description: "強い雷雨・ひょう",
-      icon: "⛈️"
-    }
-
-  };
-
-  return (
-    weatherDescriptions[weatherCode] || {
-      description: "天気情報なし",
-      icon: "❓"
-    }
-  );
-}
-
-function setupWeatherButton(campsite) {
-
-  const button =
-    document.getElementById(
-      "weather-open-button"
-    );
-
-  if (!button) {
-    return;
-  }
-
-  button.addEventListener(
-    "click",
-    () => {
-
-      openWeatherPanel(
-        campsite
-      );
-
-    }
-  );
-}
-
-
-function openWeatherPanel(campsite) {
-
-  const searchContainer =
-    document.querySelector(
-      ".search-container"
-    );
-
-  const weatherPanel =
-    document.getElementById(
-      "weather-panel"
-    );
-
-  const weatherContent =
-    document.getElementById(
-      "weather-content"
-    );
-
-  const closeButton =
-    document.getElementById(
-      "close-weather-panel"
-    );
-
-  if (
-    !searchContainer ||
-    !weatherPanel ||
-    !weatherContent
-  ) {
-
-    console.error(
-      "天気パネルが見つかりません"
-    );
-
-    return;
-  }
-
-  closeOnsenPanel();
-  closeCampsiteImagePanel();
-  closeWeatherPanel();
-
-  weatherPanel.classList.remove(
-    "hidden"
-  );
-
-  setActivePanel("weather-open");
-
-  fetchWeatherForecast(
-    campsite
-  );
-  
-  if (closeButton) {
-
-    closeButton.classList.remove(
-      "hidden"
-    );
-  }
-
-  resizeMap();
-}
-
-async function fetchWeatherForecast(campsite) {
-
-  const weatherContent =
-    document.getElementById(
-      "weather-content"
-    );
-
-  if (!weatherContent) {
-    return;
-  }
-
-  if (
-    !campsite.geometry ||
-    !campsite.geometry.location
-  ) {
-
-    weatherContent.innerHTML = `
-      <h2>キャンプ場の天気</h2>
-
-      <p>
-        キャンプ場の位置情報を取得できませんでした。
-      </p>
-    `;
-
-    return;
-  }
-
-  const latitude =
-    campsite.geometry.location.lat();
-
-  const longitude =
-    campsite.geometry.location.lng();
-
-  weatherContent.innerHTML = `
-    <h2>キャンプ場の天気</h2>
-
-    <div class="weather-loading">
-      <p>天気情報を取得中です。</p>
-    </div>
-  `;
-
-  try {
-
-    const url =
-      "https://api.open-meteo.com/v1/forecast" +
-      `?latitude=${latitude}` +
-      `&longitude=${longitude}` +
-      "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max" +
-      "&timezone=Asia%2FTokyo" +
-      "&past_days=1" +
-      "&forecast_days=7";
-
-    const response =
-      await fetch(url);
-
-    if (!response.ok) {
-
-      throw new Error(
-        `Open-Meteo API error: ${response.status}`
-      );
-
-    }
-
-    const data =
-      await response.json();
-
-    if (
-      !data.daily ||
-      !data.daily.time ||
-      data.daily.time.length === 0
-    ) {
-
-      throw new Error(
-        "天気予報データが取得できませんでした"
-      );
-
-    }
-
-    let weatherListHTML = "";
-
-    data.daily.time.forEach(
-      (date, index) => {
-
-        const weatherCode =
-          data.daily.weather_code[index];
-
-        const maxTemperature =
-          data.daily.temperature_2m_max[index];
-
-        const minTemperature =
-          data.daily.temperature_2m_min[index];
-
-        const precipitationProbability =
-          data.daily.precipitation_probability_max[index];
-
-        const weather =
-          getWeatherDescription(
-            weatherCode
-          );
-
-        weatherListHTML += `
-          <div class="detail-box">
-            <h3>
-              ${formatDateLabel(date, index)}
-            </h3>
-
-            <p>
-              <strong>天気</strong>
-            </p>
-
-            <p>
-              ${weather.icon}
-              ${weather.description}
-            </p>
-
-            <p>
-              <strong>最高気温</strong>
-            </p>
-
-            <p>
-              ${
-                maxTemperature !== null &&
-                maxTemperature !== undefined
-                  ? `${maxTemperature}℃`
-                  : "情報なし"
-              }
-            </p>
-
-            <p>
-              <strong>最低気温</strong>
-            </p>
-
-            <p>
-              ${
-                minTemperature !== null &&
-                minTemperature !== undefined
-                  ? `${minTemperature}℃`
-                  : "情報なし"
-              }
-            </p>
-
-            <p>
-              <strong>降水確率</strong>
-            </p>
-
-            <p>
-              ${
-                precipitationProbability !== null &&
-                precipitationProbability !== undefined
-                  ? `${precipitationProbability}%`
-                  : "情報なし"
-              }
-            </p>
-
-          </div>
-
-        `;
-      }
-    );
-
-    weatherContent.innerHTML = `
-
-      <h2>キャンプ場の天気</h2>
-
-      <div class="detail-box">
-
-        <h3>
-          ${campsite.name}
-        </h3>
-
-        <p>
-          前日と１週間分の天気情報です。
-        </p>
-
-      </div>
-
-      ${weatherListHTML}
-
-    `;
-
-  } catch (error) {
-
-    console.error(
-      "天気予報の取得に失敗しました:",
-      error
-    );
-
-    weatherContent.innerHTML = `
-
-      <h2>キャンプ場の天気</h2>
-
-      <div class="detail-box">
-
-        <h3>
-          ${campsite.name}
-        </h3>
-
-        <p>
-          天気予報を取得できませんでした。
-        </p>
-
-        <p>
-          時間をおいてもう一度お試しください。
-        </p>
-
-      </div>
-
-    `;
-  }
-}
-
-function closeCampsiteImagePanel() {
-
-  const searchContainer =
-    document.querySelector(
-      ".search-container"
-    );
-
-  const imagePanel =
-    document.getElementById(
-      "campsite-image-panel"
-    );
-
-  const imageContent =
-    document.getElementById(
-      "campsite-image-content"
-    );
-
-  const closeButton =
-    document.getElementById(
-      "close-campsite-image-panel"
-    );
-
-
-  if (searchContainer) {
-
-    searchContainer.classList.remove(
-      "campsite-image-open"
-    );
-  }
-
-
-  if (imagePanel) {
-
-    imagePanel.classList.add(
-      "hidden"
-    );
-  }
-
-
-  if (closeButton) {
-
-    closeButton.classList.add(
-      "hidden"
-    );
-  }
-
-
-  if (imageContent) {
-
-    imageContent.innerHTML = `
-      <h2>キャンプ場画像</h2>
-      <p>画像を表示するにはボタンを押してください</p>
-    `;
-  }
-
-
-  resizeMap();
-}
-
-function closeWeatherPanel() {
-
-  const searchContainer =
-    document.querySelector(
-      ".search-container"
-    );
-
-  const weatherPanel =
-    document.getElementById(
-      "weather-panel"
-    );
-
-  const weatherContent =
-    document.getElementById(
-      "weather-content"
-    );
-
-  const closeButton =
-    document.getElementById(
-      "close-weather-panel"
-    );
-
-  if (searchContainer) {
-
-    searchContainer.classList.remove(
-      "weather-open"
-    );
-
-  }
-
-  if (weatherPanel) {
-
-    weatherPanel.classList.add(
-      "hidden"
-    );
-
-  }
-
-  if (closeButton) {
-
-    closeButton.classList.add(
-      "hidden"
-    );
-
-  }
-
-  if (weatherContent) {
-
-    weatherContent.innerHTML = `
-
-      <h2>
-        キャンプ場の天気
-      </h2>
-
-      <p>
-        天気予報を表示するには
-        ボタンを押してください
-      </p>
-
-    `;
-
-  }
-
-  resizeMap();
-}
-
 function openFacilityDetails(
   facility,
   service,
@@ -1424,14 +636,21 @@ function openFacilityDetails(
         return;
       }
 
-      closeCampsiteImagePanel();
-      closeWeatherPanel();
+      closeCampsiteImagePanel(
+        resizeMap
+      );
+
+      closeWeatherPanel(
+        resizeMap
+      );
 
       onsenPanel.classList.remove(
         "hidden"
       );
 
-      setActivePanel("onsen-open");
+      setActivePanel(
+        "onsen-open"
+      );
 
       const closeOnsenButton =
         document.getElementById(
@@ -1751,11 +970,18 @@ function renderFavoriteCampsitePanel(
   `;
 
   setupCampsiteImageButton(
-    campsite
+    campsite,
+    closeOnsenPanel,
+    closeWeatherPanel,
+    resizeMap,
+    map
   );
 
   setupWeatherButton(
-    campsite
+    campsite,
+    closeOnsenPanel,
+    closeCampsiteImagePanel,
+    resizeMap
   );
 }
 
@@ -2313,8 +1539,12 @@ function setupCloseButtons() {
         );
 
         closeOnsenPanel();
-        closeCampsiteImagePanel();
-        closeWeatherPanel();
+        closeCampsiteImagePanel(
+          resizeMap
+        );
+        closeWeatherPanel(
+          resizeMap
+        );
 
         const panelContent =
           document.getElementById(
@@ -2360,7 +1590,9 @@ function setupCloseButtons() {
       () => {
 
         closeOnsenPanel();
-        closeWeatherPanel();
+        closeWeatherPanel(
+          resizeMap
+        );
 
         showSelectedCampsiteAndFacilities(
           map,
@@ -2396,8 +1628,12 @@ function setupCloseButtons() {
       "click",
       () => {
 
-        closeCampsiteImagePanel();
-        closeWeatherPanel();
+        closeCampsiteImagePanel(
+          resizeMap
+        );
+        closeWeatherPanel(
+          resizeMap
+        );
 
         showSelectedCampsiteAndFacilities(
           map,
@@ -2434,7 +1670,9 @@ function setupCloseButtons() {
       "click",
       () => {
 
-        closeWeatherPanel();
+        closeWeatherPanel(
+          resizeMap
+        );
 
         showSelectedCampsiteAndFacilities(
           map,
