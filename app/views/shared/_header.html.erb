@@ -6,12 +6,23 @@
   <% end %>
 
   <% if user_signed_in? %>
-    <nav class="header-nav">
-      <button id="hamburger-button" class="hamburger-button">
+    <nav
+      class="header-nav"
+      data-controller="hamburger"
+    >
+      <button
+        id="hamburger-button"
+        class="hamburger-button"
+        data-action="click->hamburger#toggle"
+      >
         ≡
       </button>
 
-      <ul id="hamburger-menu" class="hamburger-menu">
+      <ul
+        id="hamburger-menu"
+        class="hamburger-menu"
+        data-hamburger-target="menu"
+      >
         <li class="hamburger-item">
           <%= link_to "ユーザー設定", profile_path %>
         </li>
