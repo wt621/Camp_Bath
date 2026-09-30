@@ -34,6 +34,10 @@ import {
   formatRouteDistance
 } from "route";
 
+import {
+  setupCurrentLocationButton
+} from "geolocation";
+
 const FACILITY_RESULT_COUNT = 3;
 
 let map;
@@ -1747,311 +1751,150 @@ function closeOnsenPanel() {
   }
 }
 
-function setupCurrentLocationButton() {
+function handleCurrentLocationSuccess(
+  currentLocation,
+  mapInstance
+) {
+  mapInstance.setCenter(
+    currentLocation
+  );
 
-  const button =
-    document.getElementById(
-      "current-location-button"
+  mapInstance.setZoom(
+    15
+  );
+
+  if (currentLocationMarker) {
+    currentLocationMarker.setMap(
+      null
     );
-
-
-  if (!button) {
-    return;
   }
 
+  currentLocationMarker =
+    new google.maps.Marker({
+      position:
+        currentLocation,
 
-  button.replaceWith(
-    button.cloneNode(true)
+      map:
+        mapInstance,
+
+      title:
+        "現在地"
+    });
+
+  searchCampsites(
+    currentLocation
   );
 
-
-  const newButton =
-    document.getElementById(
-      "current-location-button"
+  const searchContainer =
+    document.querySelector(
+      ".search-container"
     );
 
-
-  newButton.addEventListener(
-    "click",
-    () => {
-
-      if (!navigator.geolocation) {
-
-        alert(
-          "このブラウザでは現在地を取得できません。"
-        );
-
-        return;
-      }
-
-
-      newButton.disabled = true;
-      
-      navigator.geolocation.getCurrentPosition(
-
-        position => {
-
-          const currentLocation = {
-            lat:
-              position.coords.latitude,
-
-            lng:
-              position.coords.longitude
-          };
-
-
-          const accuracy =
-            position.coords.accuracy;
-
-          if (accuracy > 5000) {
-
-            alert(
-              `現在地の取得精度が低いため、正確な位置ではない可能性があります。\n` +
-              `推定誤差：約${Math.round(
-                accuracy / 1000
-              )}km`
-            );
-          }
-
-
-          if (!map) {
-
-            console.error(
-              "Google Mapsがまだ初期化されていません"
-            );
-
-            newButton.disabled = false;
-
-            return;
-          }
-
-
-          map.setCenter(
-            currentLocation
-          );
-
-
-          map.setZoom(
-            15
-          );
-
-
-          if (currentLocationMarker) {
-
-            currentLocationMarker.setMap(
-              null
-            );
-          }
-
-
-          currentLocationMarker =
-            new google.maps.Marker({
-              position:
-                currentLocation,
-
-              map:
-                map,
-
-              title:
-                "現在地"
-            });
-
-          searchCampsites(
-            currentLocation
-          );
-
-          const searchContainer =
-            document.querySelector(
-              ".search-container"
-            );
-
-
-          if (searchContainer) {
-
-            searchContainer.classList.remove(
-              "campsite-open"
-            );
-
-            searchContainer.classList.remove(
-              "onsen-open"
-            );
-
-            searchContainer.classList.remove(
-              "campsite-image-open"
-            );
-
-            searchContainer.classList.remove(
-              "weather-open"
-            );
-          }
-
-
-          const campsitePanel =
-            document.getElementById(
-              "campsite-panel"
-            );
-
-
-          if (campsitePanel) {
-
-            campsitePanel.classList.add(
-              "hidden"
-            );
-          }
-
-
-          const onsenPanel =
-            document.getElementById(
-              "onsen-panel"
-            );
-
-
-          if (onsenPanel) {
-
-            onsenPanel.classList.add(
-              "hidden"
-            );
-          }
-
-
-          const imagePanel =
-            document.getElementById(
-              "campsite-image-panel"
-            );
-
-
-          if (imagePanel) {
-
-            imagePanel.classList.add(
-              "hidden"
-            );
-          }
-
-          const weatherPanel =
-            document.getElementById(
-              "weather-panel"
-            );
-
-          if (weatherPanel) {
-
-            weatherPanel.classList.add(
-              "hidden"
-            );
-          }
-
-          const closeCampsiteButton =
-            document.getElementById(
-              "close-campsite-panel"
-            );
-
-
-          if (closeCampsiteButton) {
-
-            closeCampsiteButton.classList.add(
-              "hidden"
-            );
-          }
-
-
-          const closeOnsenButton =
-            document.getElementById(
-              "close-onsen-panel"
-            );
-
-
-          if (closeOnsenButton) {
-
-            closeOnsenButton.classList.add(
-              "hidden"
-            );
-          }
-
-
-          const closeImageButton =
-            document.getElementById(
-              "close-campsite-image-panel"
-            );
-
-
-          if (closeImageButton) {
-
-            closeImageButton.classList.add(
-              "hidden"
-            );
-          }
-
-          const closeWeatherButton =
-            document.getElementById(
-              "close-weather-panel"
-            );
-
-          if (closeWeatherButton) {
-
-            closeWeatherButton.classList.add(
-              "hidden"
-            );
-          }
-
-          newButton.disabled = false;
-        },
-
-
-        error => {
-
-          console.error(
-            "現在地を取得できませんでした:",
-            error
-          );
-
-
-          let message =
-            "現在地を取得できませんでした。";
-
-
-          switch (error.code) {
-
-            case error.PERMISSION_DENIED:
-
-              message =
-                "位置情報の使用が拒否されています。ブラウザの位置情報設定を確認してください。";
-
-              break;
-
-
-            case error.POSITION_UNAVAILABLE:
-
-              message =
-                "現在地を取得できませんでした。GPSや位置情報サービスを確認してください。";
-
-              break;
-
-
-            case error.TIMEOUT:
-
-              message =
-                "現在地の取得がタイムアウトしました。もう一度お試しください。";
-
-              break;
-          }
-
-
-          alert(
-            message
-          );
-
-
-          newButton.disabled = false;
-        },
-
-
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
-      );
-    }
-  );
+  if (searchContainer) {
+    searchContainer.classList.remove(
+      "campsite-open"
+    );
+
+    searchContainer.classList.remove(
+      "onsen-open"
+    );
+
+    searchContainer.classList.remove(
+      "campsite-image-open"
+    );
+
+    searchContainer.classList.remove(
+      "weather-open"
+    );
+  }
+
+  const campsitePanel =
+    document.getElementById(
+      "campsite-panel"
+    );
+
+  if (campsitePanel) {
+    campsitePanel.classList.add(
+      "hidden"
+    );
+  }
+
+  const onsenPanel =
+    document.getElementById(
+      "onsen-panel"
+    );
+
+  if (onsenPanel) {
+    onsenPanel.classList.add(
+      "hidden"
+    );
+  }
+
+  const imagePanel =
+    document.getElementById(
+      "campsite-image-panel"
+    );
+
+  if (imagePanel) {
+    imagePanel.classList.add(
+      "hidden"
+    );
+  }
+
+  const weatherPanel =
+    document.getElementById(
+      "weather-panel"
+    );
+
+  if (weatherPanel) {
+    weatherPanel.classList.add(
+      "hidden"
+    );
+  }
+
+  const closeCampsiteButton =
+    document.getElementById(
+      "close-campsite-panel"
+    );
+
+  if (closeCampsiteButton) {
+    closeCampsiteButton.classList.add(
+      "hidden"
+    );
+  }
+
+  const closeOnsenButton =
+    document.getElementById(
+      "close-onsen-panel"
+    );
+
+  if (closeOnsenButton) {
+    closeOnsenButton.classList.add(
+      "hidden"
+    );
+  }
+
+  const closeImageButton =
+    document.getElementById(
+      "close-campsite-image-panel"
+    );
+
+  if (closeImageButton) {
+    closeImageButton.classList.add(
+      "hidden"
+    );
+  }
+
+  const closeWeatherButton =
+    document.getElementById(
+      "close-weather-panel"
+    );
+
+  if (closeWeatherButton) {
+    closeWeatherButton.classList.add(
+      "hidden"
+    );
+  }
 }
 
 function setupMapPage() {
@@ -2100,7 +1943,11 @@ function setupMapPage() {
 
   setupCloseButtons();
 
-  setupCurrentLocationButton();
+  setupCurrentLocationButton({
+    getMap: () => map,
+    onLocationSuccess:
+      handleCurrentLocationSuccess
+  });
 }
 
 document.addEventListener(
