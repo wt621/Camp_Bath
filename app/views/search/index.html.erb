@@ -1,24 +1,6 @@
 <div class="search-container">
 
-  <div id="campsite-panel" class="side-panel hidden">
-
-    <button
-      id="close-campsite-panel"
-      class="close-button hidden"
-    >
-      ×
-    </button>
-
-    <div id="campsite-content">
-
-      <h2>キャンプ場情報</h2>
-
-      <p>
-        キャンプ場を選択してください
-      </p>
-
-    </div>
-  </div>
+  <%= render "campsite_panel" %>
 
   <div id="map-container">
 
@@ -33,73 +15,11 @@
 
   </div>
 
-  <div id="onsen-panel" class="side-panel hidden">
+  <%= render "onsen_panel" %>
 
-    <button
-      id="close-onsen-panel"
-      class="close-button hidden"
-    >
-      ×
-    </button>
+  <%= render "campsite_image_panel" %>
 
-    <div id="onsen-content">
-
-      <h2>温泉施設情報</h2>
-
-      <p>
-        温泉を選択してください
-      </p>
-
-    </div>
-  </div>
-
-  <div
-    id="campsite-image-panel"
-    class="side-panel hidden"
-  >
-
-    <button
-      id="close-campsite-image-panel"
-      class="close-button hidden"
-    >
-      ×
-    </button>
-
-    <div id="campsite-image-content">
-
-      <h2>キャンプ場画像</h2>
-
-      <p>
-        画像を表示するにはボタンを押してください
-      </p>
-
-    </div>
-
-  </div>
-
-  <div
-    id="weather-panel"
-    class="side-panel hidden"
-  >
-
-    <button
-      id="close-weather-panel"
-      class="close-button hidden"
-    >
-      ×
-    </button>
-
-    <div id="weather-content">
-
-      <h2>キャンプ場の天気</h2>
-
-      <p>
-        天気予報を表示するにはボタンを押してください
-      </p>
-
-    </div>
-
-  </div>
+  <%= render "weather_panel" %>
 
 </div>
 
