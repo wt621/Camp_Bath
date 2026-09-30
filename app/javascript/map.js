@@ -115,11 +115,6 @@ function openCampsiteDetails(
 
   selectedCampsite = campsite;
 
-  const searchContainer =
-    document.querySelector(
-      ".search-container"
-    );
-
   closeOnsenPanel();
   closeCampsiteImagePanel(
     resizeMap
