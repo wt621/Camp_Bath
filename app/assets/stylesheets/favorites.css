@@ -1,0 +1,28 @@
+.favorites-page {
+  min-height: 100vh;
+  background-color: #fff4e6;
+}
+
+.favorite-link {
+  display: block;
+  transition: background-color 0.2s;
+}
+
+.favorite-link:hover {
+  background-color: #d0f0d1;
+}
+
+.favorite-link:hover h3,
+.favorite-link:hover p {
+  color: rgb(0, 0, 0);
+}
+
+.detail-box [data-favorite-delete] {
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.detail-box [data-favorite-delete]:hover {
+  background-color: #f8d7da;
+  color: #dc3545;
+  border-color: #dc3545;
+}
