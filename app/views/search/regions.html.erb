@@ -8,6 +8,10 @@
           <%= link_to region_data[:name], search_prefectures_path(region: region_key), class: "region-button" %>
         </li>
       <% end %>
+
+      <li>
+        <%= link_to '現在地から検索', '#', class: "region-button current-location-search-button" %>
+      </li>
     </ul>
 
     <div class="back-link-wrapper">
