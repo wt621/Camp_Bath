@@ -65,6 +65,11 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+.current-location-search-button:hover {
+  background-color: #83c7ff;
+  color: white;
+}
+
 .back-link {
   display: inline-block;
   text-align: center;
