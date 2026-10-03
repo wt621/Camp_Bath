@@ -1994,6 +1994,11 @@ function setupFavoriteButton(
     button.textContent = saved
       ? "キャンプ場・温泉情報を削除"
       : "キャンプ場・温泉情報を保存";
+
+    button.classList.toggle(
+      "favorite-delete",
+      saved
+    );
   };
 
   const checkFavorite = async () => {
