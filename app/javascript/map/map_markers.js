@@ -5,8 +5,14 @@ let selectedCampsiteMarker = null;
 const MARKER_ICON_SIZE = 32;
 
 function getMarkerIcon(iconName) {
+  const iconPaths = {
+    "Camp-icon.png": document.body.dataset.campIconPath,
+    "Onsen-icon.png": document.body.dataset.onsenIconPath,
+    "Shop-icon.png": document.body.dataset.shopIconPath
+  };
+
   return {
-    url: `/assets/${iconName}`,
+    url: iconPaths[iconName],
     scaledSize: new google.maps.Size(
       MARKER_ICON_SIZE,
       MARKER_ICON_SIZE

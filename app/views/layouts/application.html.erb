@@ -18,7 +18,11 @@
     <%= javascript_importmap_tags %>
   </head>
   
-  <body>
+  <body
+    data-camp-icon-path="<%= image_path("Camp-icon.png") %>"
+    data-onsen-icon-path="<%= image_path("Onsen-icon.png") %>"
+    data-shop-icon-path="<%= image_path("Shop-icon.png") %>"
+  >
     <header>
       <%= render "shared/header" %>
     </header>
