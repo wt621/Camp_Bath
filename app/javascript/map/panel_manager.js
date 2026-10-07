@@ -28,8 +28,24 @@ function setActivePanel(panelClass) {
 
   clearPanelClasses();
 
-  if (panelClass) {
-    searchContainer.classList.add(panelClass);
+  if (!panelClass) {
+    return;
+  }
+
+  searchContainer.classList.add(
+    panelClass
+  );
+
+  if (
+    [
+      "onsen-open",
+      "campsite-image-open",
+      "weather-open"
+    ].includes(panelClass)
+  ) {
+    searchContainer.classList.add(
+      "campsite-open"
+    );
   }
 }
 
