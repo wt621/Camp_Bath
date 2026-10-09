@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: smooth;
+}
+
 .how-to-use {
   max-width: 900px;
   margin: 0 auto;
@@ -15,7 +19,44 @@
   text-align: center;
 }
 
+.how-to-use-index {
+  margin-bottom: 50px;
+  padding: 25px;
+  background: #f3f3f3;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.how-to-use-index h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 24px;
+  text-align: center;
+}
+
+.how-to-use-index ol {
+  max-width: 600px;
+  margin: 0 auto;
+  padding-left: 25px;
+}
+
+.how-to-use-index li {
+  margin-bottom: 8px;
+  line-height: 1.7;
+}
+
+.how-to-use-index a {
+  color: #333;
+  text-decoration: none;
+}
+
+.how-to-use-index a:hover {
+  text-decoration: underline;
+}
+
 .how-to-use-section {
+  scroll-margin-top: 20px;
   margin-bottom: 50px;
   padding: 25px;
   background: #fff;
@@ -79,23 +120,21 @@
 }
 
 @media (max-width: 600px) {
-  .how-to-use-screenshots {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .how-to-use-screenshots .how-to-use-screenshot {
-    width: 100%;
-    max-width: 700px;
-  }
-}
-
-@media (max-width: 600px) {
   .how-to-use {
     padding: 20px 15px;
   }
 
+  .how-to-use-index {
+    margin-bottom: 30px;
+    padding: 20px 15px;
+  }
+
+  .how-to-use-index h2 {
+    font-size: 20px;
+  }
+
   .how-to-use-section {
+    scroll-margin-top: 10px;
     padding: 20px 15px;
     margin-bottom: 30px;
   }
@@ -106,5 +145,15 @@
 
   .how-to-use-screenshot {
     margin-top: 20px;
+  }
+
+  .how-to-use-screenshots {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .how-to-use-screenshots .how-to-use-screenshot {
+    width: 100%;
+    max-width: 700px;
   }
 }
