@@ -269,3 +269,17 @@
     text-align: center;
   }
 }
+
+@media (orientation: landscape) and (max-width: 1000px) {
+  body.search-page {
+    padding-bottom: 0;
+  }
+
+  body.search-page > footer {
+    display: none;
+  }
+
+  body.search-page .search-container {
+    height: calc(100dvh - 60px);
+  }
+}
