@@ -38,6 +38,10 @@ import {
   setupCurrentLocationButton
 } from "geolocation";
 
+import {
+  showFlashMessage
+} from "flash";
+
 const FACILITY_RESULT_COUNT = 3;
 
 let map;
@@ -683,6 +687,12 @@ function openFacilityDetails(
           "ルート情報の取得に失敗しました:",
           error
         );
+
+        if (error.status === 429) {
+          showFlashMessage(
+            "1日の検索上限に達しました"
+          );
+        }
       }
 
       const title =
@@ -1158,6 +1168,12 @@ async function renderFavoriteOnsenPanel(
       "お気に入りの温泉施設のルート情報取得に失敗しました:",
       error
     );
+
+    if (error.status === 429) {
+      showFlashMessage(
+        "1日の検索上限に達しました"
+      );
+    }
 
     const distanceElement =
       document.getElementById(
