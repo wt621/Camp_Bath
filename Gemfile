@@ -69,6 +69,7 @@ end
 
 gem "devise", "~> 5.0"
 gem "devise-i18n"
+gem "rack-attack"
 
 group :test do
   gem "capybara"

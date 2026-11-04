@@ -36,9 +36,13 @@ async function fetchRouteInfo(campsite, onsen) {
   });
 
   if (!response.ok) {
-    throw new Error(
+    const error = new Error(
       `ルート情報の取得に失敗しました: ${response.status}`
     );
+
+    error.status = response.status;
+
+    throw error;
   }
 
   const data = await response.json();
